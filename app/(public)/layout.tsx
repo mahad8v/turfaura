@@ -1,7 +1,15 @@
 import Link from "next/link";
-import { Goal, ArrowRight, LogIn } from "lucide-react";
+import { Goal } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { UserMenu } from "@/components/shared/UserMenu";
+import { logout } from "../(owner)/actions";
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+export default async function PublicLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50">
       <header className="sticky top-0 z-30 border-b border-zinc-200/80 bg-white/80 backdrop-blur-md">
@@ -14,29 +22,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               TurfAura
             </span>
           </Link>
-          <nav className="flex shrink-0 items-center gap-1.5 text-sm font-medium sm:gap-3">
-            <Link
-              href="/login"
-              className="hidden rounded-lg px-3 py-2 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 sm:inline-block"
-            >
-              Owner login
-            </Link>
-            <Link
-              href="/login"
-              aria-label="Owner login"
-              className="flex size-9 shrink-0 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-100 sm:hidden"
-            >
-              <LogIn className="size-4" />
-            </Link>
-            <Link
-              href="/signup"
-              className="group inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-emerald-600 px-3 py-2 text-white shadow-sm shadow-emerald-600/25 transition-all hover:bg-emerald-700 hover:shadow-md active:scale-[0.98] sm:px-3.5"
-            >
-              <span className="sm:hidden">List pitch</span>
-              <span className="hidden sm:inline">List your pitch</span>
-              <ArrowRight className="hidden size-3.5 transition-transform group-hover:translate-x-0.5 sm:inline" />
-            </Link>
-          </nav>
+          <UserMenu loggedIn={Boolean(user)} logoutAction={logout} />
         </div>
       </header>
       <main className="flex-1">{children}</main>
