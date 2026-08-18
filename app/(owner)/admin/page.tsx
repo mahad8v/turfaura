@@ -1,8 +1,8 @@
-import { Users, MapPinned, CalendarCheck, Wallet, Clock, HandCoins, ShieldCheck } from "lucide-react";
+import { Users, MapPinned, CalendarCheck, Clock, HandCoins, ShieldCheck, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Money } from "@/components/shared/Money";
 import { StatCard } from "@/components/shared/StatCard";
-import { BookingStatusBadge } from "@/components/shared/StatusBadge";
+import { StatusDistributionBar } from "@/components/shared/StatusDistributionBar";
 import { BookingStatus } from "@/generated/prisma/client";
 
 export default async function AdminOverviewPage() {
@@ -20,6 +20,13 @@ export default async function AdminOverviewPage() {
 
   const countFor = (status: BookingStatus) => statusCounts.find((s) => s.status === status)?._count._all ?? 0;
   const totalBookings = statusCounts.reduce((sum, s) => sum + s._count._all, 0);
+
+  const statusOrder = [
+    BookingStatus.PENDING,
+    BookingStatus.CONFIRMED,
+    BookingStatus.CANCELLED,
+    BookingStatus.EXPIRED,
+  ] as const;
 
   return (
     <div>
@@ -41,7 +48,7 @@ export default async function AdminOverviewPage() {
         </div>
       </div>
 
-      <div className="relative z-10 -mt-8 grid gap-4 px-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="animate-fade-in-up relative z-10 -mt-8 grid gap-4 px-1 sm:grid-cols-2 lg:grid-cols-4 [animation-delay:200ms]">
         <StatCard icon={Users} label="Pitch owners" value={String(ownerCount)} accent="indigo" />
         <StatCard icon={MapPinned} label="Pitches listed" value={String(pitchCount)} accent="indigo" />
         <StatCard icon={CalendarCheck} label="Total bookings" value={String(totalBookings)} accent="indigo" />
@@ -54,46 +61,38 @@ export default async function AdminOverviewPage() {
         />
       </div>
 
-      <h2 className="font-display mt-8 text-sm font-bold text-zinc-900">Bookings by status</h2>
-      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {(
-          [BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.CANCELLED, BookingStatus.EXPIRED] as const
-        ).map((status) => (
-          <div
-            key={status}
-            className="flex flex-col items-center gap-2 rounded-2xl border border-zinc-200 bg-white p-4 text-center shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md"
-          >
-            <p className="font-display text-2xl font-extrabold tracking-tight text-zinc-900">{countFor(status)}</p>
-            <BookingStatusBadge status={status} />
+      <div className="animate-fade-in-up mt-6 grid gap-4 lg:grid-cols-5 [animation-delay:260ms]">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-5 lg:col-span-3">
+          <h2 className="font-display flex items-center gap-2 text-sm font-bold text-zinc-900">
+            <TrendingUp className="size-4 text-indigo-600" />
+            Bookings by status
+          </h2>
+          <div className="mt-4">
+            <StatusDistributionBar counts={statusOrder.map((status) => ({ status, count: countFor(status) }))} />
           </div>
-        ))}
-      </div>
+        </div>
 
-      <h2 className="font-display mt-8 flex items-center gap-2 text-sm font-bold text-zinc-900">
-        <HandCoins className="size-4 text-indigo-600" />
-        Confirmed cash value across the platform
-      </h2>
-      <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {confirmedValue.map((row) => (
-          <div
-            key={row.currency}
-            className="group rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md"
-          >
-            <span className="flex size-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 transition-transform duration-200 group-hover:scale-105">
-              <Wallet className="size-4.5" strokeWidth={2.25} />
-            </span>
-            <p className="mt-3.5 text-sm text-zinc-500">{row.currency}</p>
-            <p className="font-display mt-0.5 text-2xl font-extrabold tracking-tight text-zinc-900">
-              <Money amount={row._sum.totalPrice?.toString() ?? "0"} currency={row.currency} />
-            </p>
-            <p className="mt-1 text-xs text-zinc-400">{row._count._all} confirmed bookings, paid in cash at the pitch</p>
-          </div>
-        ))}
-        {confirmedValue.length === 0 && (
-          <p className="col-span-full rounded-2xl border border-dashed border-zinc-300 bg-white py-8 text-center text-sm text-zinc-500">
-            No confirmed bookings on the platform yet.
-          </p>
-        )}
+        <div className="rounded-2xl border border-zinc-200 bg-linear-to-br from-emerald-50/70 to-white p-5 lg:col-span-2">
+          <span className="flex size-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm shadow-emerald-600/30">
+            <HandCoins className="size-4.5" strokeWidth={2.25} />
+          </span>
+          <p className="mt-3.5 text-sm text-zinc-500">Confirmed cash value</p>
+          {confirmedValue.length > 0 ? (
+            <div className="mt-1 flex flex-col gap-2">
+              {confirmedValue.map((row) => (
+                <div key={row.currency} className="flex items-baseline justify-between gap-2">
+                  <p className="font-display text-2xl font-extrabold tracking-tight text-zinc-900">
+                    <Money amount={row._sum.totalPrice?.toString() ?? "0"} currency={row.currency} />
+                  </p>
+                  <p className="shrink-0 text-xs text-zinc-400">{row._count._all} bookings</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="font-display mt-1 text-2xl font-extrabold tracking-tight text-zinc-300">—</p>
+          )}
+          <p className="mt-2 text-xs text-zinc-400">Paid in cash at the pitch, across every owner.</p>
+        </div>
       </div>
     </div>
   );
