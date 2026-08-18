@@ -3,6 +3,7 @@ import { Prisma, BookingStatus, type Pitch } from "@/generated/prisma/client";
 import { generateBookingReference } from "@/lib/booking-reference";
 import { APPROVAL_HOURS } from "@/lib/constants";
 import { addMinutesToTime, expireStaleHolds, toDateOnly } from "@/lib/availability";
+import { isPastSlot } from "@/lib/time";
 import { notifyOwnerOfNewBooking } from "@/lib/telegram";
 
 export interface CreateBookingInput {
@@ -16,7 +17,7 @@ export interface CreateBookingInput {
 
 export type CreateBookingResult =
   | { ok: true; bookingId: string; reference: string }
-  | { ok: false; error: "SLOT_TAKEN" | "PITCH_NOT_FOUND" | "SLOT_OUT_OF_RANGE" };
+  | { ok: false; error: "SLOT_TAKEN" | "PITCH_NOT_FOUND" | "SLOT_OUT_OF_RANGE" | "SLOT_IN_PAST" };
 
 export function computePricing(
   pitch: Pick<Pitch, "basePricePerHour" | "slotDurationMinutes">,
@@ -49,6 +50,9 @@ export async function createBookingWithHold(input: CreateBookingInput): Promise<
   const endTime = addMinutesToTime(input.startTime, duration);
   if (input.startTime < pitch.openTime || endTime > pitch.closeTime) {
     return { ok: false, error: "SLOT_OUT_OF_RANGE" };
+  }
+  if (isPastSlot(input.date, input.startTime)) {
+    return { ok: false, error: "SLOT_IN_PAST" };
   }
 
   const { totalPrice } = computePricing(pitch, duration);

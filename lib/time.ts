@@ -13,3 +13,18 @@ export function addMinutesToTime(time: string, minutes: number): string {
   const mm = total % 60;
   return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
 }
+
+/**
+ * True if a "YYYY-MM-DD" date + "HH:mm" start time has already passed,
+ * against the current clock — dates/times are treated as plain UTC
+ * wall-clock values throughout this app (see toDateOnly in availability.ts),
+ * so "now" is read in UTC here too for consistency.
+ */
+export function isPastSlot(dateStr: string, startTime: string): boolean {
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10);
+  if (dateStr < todayStr) return true;
+  if (dateStr > todayStr) return false;
+  const nowMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+  return timeToMinutes(startTime) <= nowMinutes;
+}

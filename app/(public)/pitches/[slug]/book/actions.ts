@@ -11,6 +11,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   SLOT_TAKEN: "Sorry, that slot was just taken. Please pick another time.",
   PITCH_NOT_FOUND: "This pitch is no longer available.",
   SLOT_OUT_OF_RANGE: "That time isn't available for this pitch.",
+  SLOT_IN_PAST: "That time has already passed. Please pick a different time.",
 };
 
 export async function createBooking(

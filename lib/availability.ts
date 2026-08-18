@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { BookingStatus } from "@/generated/prisma/client";
-import { timeToMinutes, addMinutesToTime } from "@/lib/time";
+import { timeToMinutes, addMinutesToTime, isPastSlot } from "@/lib/time";
 
 export { timeToMinutes, addMinutesToTime };
 
@@ -70,8 +70,9 @@ export async function getAvailability(
     const isBlocked =
       blockedSlots.some((b) => rangesOverlap(start, end, b.startTime, b.endTime ?? pitch.closeTime)) ||
       recurringBlockedSlots.some((b) => rangesOverlap(start, end, b.startTime, b.endTime));
+    const isPast = isPastSlot(dateStr, start);
 
-    slots.push({ startTime: start, endTime: end, available: !isBooked && !isBlocked });
+    slots.push({ startTime: start, endTime: end, available: !isBooked && !isBlocked && !isPast });
     // Step by the pitch's base grid, not by the requested duration, so e.g. a
     // 2-hour search still offers every hour mark as a possible start time.
     cursor = addMinutesToTime(cursor, pitch.slotDurationMinutes);
