@@ -74,7 +74,7 @@ export function PitchForm({ action, defaults = {}, submitLabel }: PitchFormProps
           error on an unrendered field — Chrome and Firefox both just block
           submission silently in that case. The server already validates
           every field via zod and surfaces a clear error below instead. */}
-      <section className={`grid gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:grid-cols-2 ${tab === "basics" ? "" : "hidden"}`}>
+      <section className={`grid gap-4 rounded-2xl border border-zinc-200 bg-white p-5 sm:grid-cols-2 ${tab === "basics" ? "" : "hidden"}`}>
         <TextField label="Pitch name" name="name" defaultValue={defaults.name} />
         <SelectField label="Pitch type" name="type" defaultValue={defaults.type ?? "FIVE_A_SIDE"}>
           {PITCH_TYPE_OPTIONS.map((value) => (
@@ -108,7 +108,7 @@ export function PitchForm({ action, defaults = {}, submitLabel }: PitchFormProps
         <TextField label="Longitude" name="lng" type="number" step="any" defaultValue={defaults.lng} />
       </section>
 
-      <section className={`grid gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:grid-cols-2 ${tab === "pricing" ? "" : "hidden"}`}>
+      <section className={`grid gap-4 rounded-2xl border border-zinc-200 bg-white p-5 sm:grid-cols-2 ${tab === "pricing" ? "" : "hidden"}`}>
         <TextField
           label="Price per hour"
           name="basePricePerHour"
@@ -121,7 +121,7 @@ export function PitchForm({ action, defaults = {}, submitLabel }: PitchFormProps
         <TextField label="Currency" name="currency" defaultValue={defaults.currency ?? "GMD"} maxLength={3} />
       </section>
 
-      <section className={`grid gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:grid-cols-2 ${tab === "schedule" ? "" : "hidden"}`}>
+      <section className={`grid gap-4 rounded-2xl border border-zinc-200 bg-white p-5 sm:grid-cols-2 ${tab === "schedule" ? "" : "hidden"}`}>
         <SelectField
           label="Slot length"
           name="slotDurationMinutes"

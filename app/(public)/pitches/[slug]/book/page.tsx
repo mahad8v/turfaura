@@ -33,7 +33,7 @@ export default async function BookPage({
       <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">Confirm your booking</p>
       <h1 className="font-display mt-1 text-2xl font-extrabold text-zinc-900">Reserve this slot</h1>
 
-      <div className="mt-5 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+      <div className="mt-5 overflow-hidden rounded-2xl border border-zinc-200 bg-white">
         <div className="bg-emerald-50/60 px-5 py-4">
           <p className="font-display font-bold text-zinc-900">{pitch.name}</p>
           <p className="mt-1.5 flex items-center gap-1.5 text-sm text-zinc-600">

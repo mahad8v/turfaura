@@ -30,7 +30,7 @@ export default async function AdminPitchesPage() {
         {pitches.map((pitch) => (
           <div
             key={pitch.id}
-            className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-zinc-300 hover:shadow-md"
+            className="rounded-2xl border border-zinc-200 bg-white p-4 transition-colors duration-200 hover:border-zinc-300"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex min-w-0 items-start gap-3">
@@ -63,7 +63,7 @@ export default async function AdminPitchesPage() {
             <div className="mt-3 flex items-center gap-2">
               <Link
                 href={`/dashboard/pitches/${pitch.id}`}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-400 hover:bg-zinc-50"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-50"
               >
                 <Pencil className="size-3.5" />
                 Edit
@@ -88,7 +88,7 @@ export default async function AdminPitchesPage() {
       </div>
 
       {/* Desktop/tablet: full table. */}
-      <div className="mt-6 hidden overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm md:block">
+      <div className="mt-6 hidden overflow-hidden rounded-2xl border border-zinc-200 bg-white md:block">
         <table className="min-w-full divide-y divide-zinc-100 text-sm">
           <thead>
             <tr className="bg-zinc-50/80 text-left text-xs font-medium uppercase tracking-wide text-zinc-400">
@@ -135,7 +135,7 @@ export default async function AdminPitchesPage() {
                   <div className="flex flex-col items-end gap-2">
                     <Link
                       href={`/dashboard/pitches/${pitch.id}`}
-                      className="flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-400 hover:bg-zinc-50"
+                      className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-50"
                     >
                       <Pencil className="size-3.5" />
                       Edit

@@ -22,14 +22,14 @@ export function StatCard({
   accent?: Accent;
 }) {
   return (
-    <div className="group rounded-2xl border border-zinc-200 bg-white p-3.5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md sm:p-5">
+    <div className="group rounded-2xl border border-zinc-200 bg-white p-3.5 transition-colors duration-200 hover:border-zinc-300 sm:p-5">
       <span
         className={`flex size-8 items-center justify-center rounded-lg transition-transform duration-200 group-hover:scale-105 sm:size-10 sm:rounded-xl ${accentClasses[accent]}`}
       >
         <Icon className="size-4 sm:size-4.5" strokeWidth={2.25} />
       </span>
       <p className="mt-2.5 truncate text-xs text-zinc-500 sm:mt-3.5 sm:text-sm">{label}</p>
-      <p className="font-display mt-0.5 text-xl font-extrabold tracking-tight text-zinc-900 sm:text-2xl">{value}</p>
+      <p className="font-display mt-0.5 text-lg font-bold tracking-tight text-zinc-900 sm:text-xl">{value}</p>
       {hint && <p className="mt-1 truncate text-[11px] text-zinc-400 sm:text-xs">{hint}</p>}
     </div>
   );

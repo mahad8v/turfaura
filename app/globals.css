@@ -38,3 +38,19 @@ body {
 .animate-fade-in-up {
   animation: fade-in-up 0.4s ease-out both;
 }
+
+/* Shimmer loading placeholders — a soft gradient sweep, not a flat pulse. */
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.skeleton {
+  background-image: linear-gradient(90deg, var(--color-zinc-100) 25%, var(--color-zinc-200) 50%, var(--color-zinc-100) 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}

@@ -17,7 +17,7 @@ export function BookingForm({
   const [state, formAction, pending] = useActionState(action, null);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+    <form action={formAction} className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-5">
       <TextField label="Your name" name="customerName" icon={<User className="size-4" />} required />
       <TextField
         label="Phone number"

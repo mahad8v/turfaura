@@ -46,7 +46,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ refere
         )}
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white">
         <div className="p-5">
           <p className="font-display font-bold text-zinc-900">{booking.pitch.name}</p>
           <p className="mt-1.5 flex items-center gap-1.5 text-sm text-zinc-500">

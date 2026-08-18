@@ -20,7 +20,7 @@ export default function SignupPage() {
           <span className="font-display text-xl font-extrabold tracking-tight text-zinc-900">TurfAura</span>
         </Link>
 
-        <div className="rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-7">
           <h1 className="font-display text-xl font-bold text-zinc-900">Create your owner account</h1>
           <p className="mt-1 text-sm text-zinc-500">List pitches, set pricing, and manage bookings.</p>
 

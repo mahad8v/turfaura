@@ -2,7 +2,10 @@ import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTML
 import { ChevronDown } from "lucide-react";
 
 const inputClass =
-  "w-full rounded-xl border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 shadow-sm outline-none transition-colors placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20";
+  "w-full rounded-full border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-all placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10";
+
+const textareaClass =
+  "w-full rounded-3xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-all placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10";
 
 interface FieldWrapperProps {
   label: string;
@@ -28,12 +31,12 @@ export function TextField({
         {required && <span className="text-emerald-600"> *</span>}
       </span>
       <div className="relative">
-        {icon && <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400">{icon}</span>}
+        {icon && <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400">{icon}</span>}
         <input
           id={name}
           name={name}
           required={required}
-          className={`${inputClass} ${icon ? "pl-10" : ""} ${className ?? ""}`}
+          className={`${inputClass} ${icon ? "pl-11" : ""} ${className ?? ""}`}
           {...props}
         />
       </div>
@@ -56,7 +59,7 @@ export function TextAreaField({
         {label}
         {required && <span className="text-emerald-600"> *</span>}
       </span>
-      <textarea id={name} name={name} required={required} className={`${inputClass} resize-none ${className ?? ""}`} {...props} />
+      <textarea id={name} name={name} required={required} className={`${textareaClass} resize-none ${className ?? ""}`} {...props} />
       {hint && <span className="text-xs text-zinc-500">{hint}</span>}
     </label>
   );
@@ -82,12 +85,12 @@ export function SelectField({
           id={name}
           name={name}
           required={required}
-          className={`${inputClass} appearance-none pr-9 ${className ?? ""}`}
+          className={`${inputClass} appearance-none pr-10 ${className ?? ""}`}
           {...props}
         >
           {children}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
+        <ChevronDown className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
       </div>
       {hint && <span className="text-xs text-zinc-500">{hint}</span>}
     </label>

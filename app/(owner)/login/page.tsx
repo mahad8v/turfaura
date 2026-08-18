@@ -35,7 +35,7 @@ export default function LoginPage() {
           <span className="font-display text-xl font-extrabold tracking-tight text-zinc-900">TurfAura</span>
         </Link>
 
-        <div className="rounded-2xl border border-zinc-200 bg-white p-7 shadow-sm">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-7">
           <h1 className="font-display text-xl font-bold text-zinc-900">Pitch owner login</h1>
           <p className="mt-1 text-sm text-zinc-500">Manage your pitches, pricing, and bookings.</p>
 
@@ -87,7 +87,7 @@ export default function LoginPage() {
                     setEmail(account.email);
                     setPassword(account.password);
                   }}
-                  className="flex items-center justify-between gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 text-left text-sm text-zinc-700 transition-colors hover:border-amber-400 hover:bg-amber-100/60"
+                  className="flex items-center justify-between gap-2 rounded-full border border-amber-200 bg-white px-3.5 py-2.5 text-left text-sm text-zinc-700 transition-colors hover:border-amber-400 hover:bg-amber-100/60"
                 >
                   <span className="font-medium">{account.label}</span>
                   <span className="truncate text-xs text-zinc-400">{account.email}</span>

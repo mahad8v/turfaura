@@ -109,15 +109,10 @@ export function DashboardShell({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
+                  className={`group flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-150 ${
                     active ? `${t.activeBg} ${t.activeText}` : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
                   }`}
                 >
-                  {active && (
-                    <span
-                      className={`absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-linear-to-b ${t.gradient}`}
-                    />
-                  )}
                   <Icon
                     className={`size-4 shrink-0 transition-transform duration-150 ${active ? "" : "group-hover:scale-110"}`}
                   />
@@ -144,7 +139,7 @@ export function DashboardShell({
             <form action={logoutAction} className="mt-2">
               <button
                 type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-400 hover:bg-zinc-50"
+                className="flex w-full items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-50"
               >
                 <LogOut className="size-3.5" />
                 Log out
@@ -170,7 +165,7 @@ export function DashboardShell({
             <button
               type="submit"
               aria-label="Log out"
-              className="flex size-9 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100"
+              className="flex size-9 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-100"
             >
               <LogOut className="size-4" />
             </button>

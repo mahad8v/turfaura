@@ -73,7 +73,7 @@ export function BookingCalendar({
   const todayStr = new Date().toISOString().slice(0, 10);
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm sm:p-5">
+    <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-base font-bold text-zinc-900">
           {MONTH_NAMES[month - 1]} {year}

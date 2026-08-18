@@ -5,7 +5,7 @@ export function PitchMap({ lat, lng, name }: { lat: number; lng: number; name: s
   const navigateHref = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-200 shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-zinc-200">
       <iframe
         src={embedSrc}
         title={`Map showing ${name}`}

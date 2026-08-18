@@ -108,7 +108,7 @@ export function BookingsTable({ bookings, approveBooking, cancelBooking }: Booki
         {bookings.map((b) => {
           const rowPending = isPending && pendingId === b.id;
           return (
-            <div key={b.id} className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <div key={b.id} className="rounded-2xl border border-zinc-200 bg-white p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-medium text-zinc-900">{b.pitchName}</p>
@@ -148,7 +148,7 @@ export function BookingsTable({ bookings, approveBooking, cancelBooking }: Booki
       </div>
 
       {/* Desktop/tablet: full table. */}
-      <div className="hidden overflow-x-auto rounded-2xl border border-zinc-200 bg-white shadow-sm md:block">
+      <div className="hidden overflow-x-auto rounded-2xl border border-zinc-200 bg-white md:block">
         <table className="min-w-full divide-y divide-zinc-100 text-sm">
           <thead>
             <tr className="text-left text-xs font-medium uppercase tracking-wide text-zinc-400">

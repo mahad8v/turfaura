@@ -55,7 +55,7 @@ export function BlockedSlotManager({
   }
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+    <section className="rounded-2xl border border-zinc-200 bg-white p-5">
       <h2 className="flex items-center gap-2 font-display text-sm font-bold text-zinc-900">
         <span className="flex size-6 items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
           <CalendarOff className="size-3.5" strokeWidth={2.25} />

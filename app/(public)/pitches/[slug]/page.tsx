@@ -77,7 +77,7 @@ export default async function PitchDetailPage({ params }: { params: Promise<{ sl
 
         <div>
           <div className="flex flex-col gap-4 lg:sticky lg:top-20">
-            <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-zinc-200 bg-white p-5">
               <p className="text-sm text-zinc-500">Starting from</p>
               <p className="font-display mt-0.5 text-2xl font-extrabold text-zinc-900">
                 <Money amount={pitch.basePricePerHour.toString()} currency={pitch.currency} />
