@@ -1,10 +1,14 @@
-import Link from "next/link";
-import { Goal } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import { UserMenu } from "@/components/shared/UserMenu";
-import { logout } from "../(owner)/actions";
+import Link from 'next/link';
+import { Goal } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
+import { UserMenu } from '@/components/shared/UserMenu';
+import { logout } from '../(owner)/actions';
 
-export default async function PublicLayout({ children }: { children: React.ReactNode }) {
+export default async function PublicLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -26,13 +30,15 @@ export default async function PublicLayout({ children }: { children: React.React
         </div>
       </header>
       <main className="flex-1">{children}</main>
-      <footer className="border-t border-zinc-200 bg-white">
+      <footer className="">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-4 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
           <div className="flex items-center gap-2 text-sm font-semibold text-zinc-700">
             <Goal className="size-4 text-emerald-600" />
             TurfAura
           </div>
-          <p className="text-xs text-zinc-400">Book a pitch in minutes. No account needed.</p>
+          <p className="text-xs text-zinc-400">
+            Book a pitch in minutes. No account needed.
+          </p>
         </div>
       </footer>
     </div>

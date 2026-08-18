@@ -1,20 +1,21 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { Loader2 } from "lucide-react";
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { Loader2 } from 'lucide-react';
 
 const variants = {
   primary:
-    "bg-emerald-600 text-white shadow-sm shadow-emerald-600/25 hover:bg-emerald-700 disabled:bg-emerald-300 disabled:shadow-none",
+    'bg-emerald-600 text-white shadow-sm shadow-emerald-600/25 hover:bg-emerald-700 disabled:bg-emerald-300 disabled:shadow-none',
   secondary:
-    "bg-white text-zinc-700 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 disabled:text-zinc-400 disabled:hover:bg-white",
+    'bg-white text-zinc-700 border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 disabled:text-zinc-400 disabled:hover:bg-white',
   danger:
-    "bg-red-600 text-white shadow-sm shadow-red-600/25 hover:bg-red-700 disabled:bg-red-300 disabled:shadow-none",
-  ghost: "text-zinc-600 hover:bg-zinc-100 disabled:text-zinc-300 disabled:hover:bg-transparent",
+    'bg-red-600 text-white shadow-sm shadow-red-600/25 hover:bg-red-700 disabled:bg-red-300 disabled:shadow-none',
+  ghost:
+    'text-zinc-600 hover:bg-zinc-100 disabled:text-zinc-300 disabled:hover:bg-transparent',
 };
 
 const sizes = {
-  sm: "px-3.5 py-1.5 text-xs rounded-full",
-  md: "px-5 py-2.5 text-sm rounded-full",
-  lg: "px-6 py-3.5 text-base rounded-full",
+  sm: 'px-3.5 py-1.5 text-xs rounded-full',
+  md: 'px-5 py-2.5 text-sm rounded-full',
+  lg: 'px-6 py-3.5 text-base rounded-full',
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -26,8 +27,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Button({
-  variant = "primary",
-  size = "md",
+  variant = 'primary',
+  size = 'md',
   pending,
   pendingText,
   icon,
@@ -39,13 +40,13 @@ export function Button({
   return (
     <button
       disabled={disabled || pending}
-      className={`inline-flex items-center justify-center gap-2 font-medium transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:active:scale-100 ${variants[variant]} ${sizes[size]} ${className ?? ""}`}
+      className={`inline-flex items-center justify-center gap-2 font-medium transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:active:scale-100 ${variants[variant]} ${sizes[size]} ${className ?? ''}`}
       {...props}
     >
       {pending ? (
         <>
           <Loader2 className="size-4 animate-spin" strokeWidth={2.5} />
-          {pendingText ?? "Working…"}
+          {pendingText ?? 'Working…'}
         </>
       ) : (
         <>
