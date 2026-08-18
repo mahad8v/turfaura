@@ -1,0 +1,167 @@
+// TurfAura — Football Pitch Booking Marketplace
+// See /home/zerobug110/.claude/plans/sprightly-discovering-tome.md for the architecture this implements.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------- Enums ----------
+
+enum BookingStatus {
+  PENDING // booked, awaiting the owner's approval (customer pays cash after playing)
+  CONFIRMED // owner approved the booking
+  CANCELLED // cancelled (by customer request, owner, or admin)
+  EXPIRED // owner didn't approve/reject before the auto-expiry window
+}
+
+enum OwnerRole {
+  OWNER
+  ADMIN // reserved for a future admin portal, unused in v1
+}
+
+enum PitchType {
+  FIVE_A_SIDE
+  SEVEN_A_SIDE
+  ELEVEN_A_SIDE
+}
+
+// ---------- Core models ----------
+
+model Owner {
+  id             String    @id @default(uuid())
+  supabaseUserId String    @unique
+  name           String
+  email          String    @unique
+  phone          String? // WhatsApp contact number customers reach the owner on
+  role           OwnerRole @default(OWNER)
+
+  // Telegram Bot notifications: chatId is set once the owner completes the
+  // /start deep-link flow (see lib/telegram.ts); linkToken is the one-time
+  // secret embedded in that link, cleared once it's been claimed.
+  telegramChatId    String? @unique
+  telegramLinkToken String? @unique
+
+  pitches Pitch[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pitch {
+  id          String    @id @default(uuid())
+  ownerId     String
+  owner       Owner     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name        String
+  slug        String    @unique
+  description String?
+  address     String
+  area        String    @default("") // neighbourhood/district, e.g. "Ouakam" — powers the location filter
+  lat         Float
+  lng         Float
+  type        PitchType @default(FIVE_A_SIDE)
+
+  photos PitchPhoto[]
+
+  basePricePerHour Decimal @db.Decimal(10, 2)
+  currency         String  @default("GMD")
+
+  slotDurationMinutes Int    @default(60)
+  openTime            String @default("06:00") // "HH:mm", pitch's local wall-clock time
+  closeTime           String @default("22:00")
+
+  isActive Boolean @default(true)
+
+  priceOverrides PriceOverride[]
+  blockedSlots   BlockedSlot[]
+  bookings       Booking[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+}
+
+model PitchPhoto {
+  id          String @id @default(uuid())
+  pitchId     String
+  pitch       Pitch  @relation(fields: [pitchId], references: [id], onDelete: Cascade)
+  storagePath String // Supabase Storage object path, not a URL — resolved via getPublicUrl at render time
+  sortOrder   Int    @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([pitchId])
+}
+
+// Schema-ready for day/time-based pricing; not exposed in the v1 owner UI.
+model PriceOverride {
+  id           String  @id @default(uuid())
+  pitchId      String
+  pitch        Pitch   @relation(fields: [pitchId], references: [id], onDelete: Cascade)
+  dayOfWeek    Int? // 0=Sunday..6=Saturday, null = applies every day
+  startTime    String // "HH:mm"
+  endTime      String // "HH:mm"
+  pricePerHour Decimal @db.Decimal(10, 2)
+
+  @@index([pitchId])
+}
+
+// Owner-set unavailability (maintenance, private hire, etc.)
+model BlockedSlot {
+  id        String   @id @default(uuid())
+  pitchId   String
+  pitch     Pitch    @relation(fields: [pitchId], references: [id], onDelete: Cascade)
+  date      DateTime @db.Date
+  startTime String // "HH:mm" — a null endTime means the block runs through the pitch's closing time
+  endTime   String?
+  reason    String?
+
+  createdAt DateTime @default(now())
+
+  @@index([pitchId, date])
+}
+
+// Double-booking protection lives outside this file: a Postgres EXCLUDE
+// constraint (`no_overlapping_active_bookings`, see the
+// booking_overlap_exclusion migration) rejects any new active booking whose
+// [startTime, endTime) range overlaps an existing active one for the same
+// pitch/date — necessary because bookings can span multiple slots (e.g. a
+// 2-hour booking), so two different start times can still conflict.
+model Booking {
+  id        String @id @default(uuid())
+  reference String @unique // human-shareable code, e.g. "TA-7K4QXP"
+
+  pitchId String
+  pitch   Pitch  @relation(fields: [pitchId], references: [id], onDelete: Restrict)
+
+  customerName  String
+  customerPhone String
+
+  date      DateTime @db.Date
+  startTime String // "HH:mm", pitch's local wall-clock time
+  endTime   String
+
+  totalPrice Decimal @db.Decimal(10, 2) // paid in cash at the pitch after playing
+  currency   String  @default("GMD")
+
+  status BookingStatus @default(PENDING)
+
+  // Auto-release safety net: if the owner hasn't approved or rejected by
+  // this time, the booking flips to EXPIRED and the slot frees up.
+  expiresAt DateTime?
+
+  approvedAt DateTime?
+  approvedBy String? // Owner.id who approved
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pitchId, date])
+  @@index([status])
+}
