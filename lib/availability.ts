@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { BookingStatus } from "@/generated/prisma/client";
+import { timeToMinutes, addMinutesToTime } from "@/lib/time";
+
+export { timeToMinutes, addMinutesToTime };
 
 export interface SlotAvailability {
   startTime: string;
@@ -8,18 +11,6 @@ export interface SlotAvailability {
 }
 
 const ACTIVE_STATUSES: BookingStatus[] = [BookingStatus.PENDING, BookingStatus.CONFIRMED];
-
-export function timeToMinutes(time: string): number {
-  const [h, m] = time.split(":").map(Number);
-  return h * 60 + m;
-}
-
-export function addMinutesToTime(time: string, minutes: number): string {
-  const total = timeToMinutes(time) + minutes;
-  const hh = Math.floor(total / 60) % 24;
-  const mm = total % 60;
-  return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
-}
 
 /** Midnight-UTC Date for a "YYYY-MM-DD" string, matching how Prisma stores @db.Date columns. */
 export function toDateOnly(dateStr: string): Date {
@@ -59,12 +50,13 @@ export async function getAvailability(
 
   await expireStaleHolds(pitchId);
 
-  const [bookings, blockedSlots] = await Promise.all([
+  const [bookings, blockedSlots, recurringBlockedSlots] = await Promise.all([
     prisma.booking.findMany({
       where: { pitchId, date, status: { in: ACTIVE_STATUSES } },
       select: { startTime: true, endTime: true },
     }),
     prisma.blockedSlot.findMany({ where: { pitchId, date } }),
+    prisma.recurringBlockedSlot.findMany({ where: { pitchId, dayOfWeek: date.getUTCDay() } }),
   ]);
 
   const slots: SlotAvailability[] = [];
@@ -75,9 +67,9 @@ export async function getAvailability(
     const end = addMinutesToTime(cursor, duration);
 
     const isBooked = bookings.some((b) => rangesOverlap(start, end, b.startTime, b.endTime));
-    const isBlocked = blockedSlots.some((b) =>
-      rangesOverlap(start, end, b.startTime, b.endTime ?? pitch.closeTime),
-    );
+    const isBlocked =
+      blockedSlots.some((b) => rangesOverlap(start, end, b.startTime, b.endTime ?? pitch.closeTime)) ||
+      recurringBlockedSlots.some((b) => rangesOverlap(start, end, b.startTime, b.endTime));
 
     slots.push({ startTime: start, endTime: end, available: !isBooked && !isBlocked });
     // Step by the pitch's base grid, not by the requested duration, so e.g. a

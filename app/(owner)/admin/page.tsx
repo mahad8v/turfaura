@@ -1,12 +1,15 @@
-import { Users, MapPinned, CalendarCheck, Clock, HandCoins, ShieldCheck, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { Users, MapPinned, CalendarCheck, Clock, HandCoins, ShieldCheck, TrendingUp, ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Money } from "@/components/shared/Money";
 import { StatCard } from "@/components/shared/StatCard";
 import { StatusDistributionBar } from "@/components/shared/StatusDistributionBar";
+import { BookingStatusBadge } from "@/components/shared/StatusBadge";
+import { formatDateLong, formatTimeRangeShort } from "@/lib/format";
 import { BookingStatus } from "@/generated/prisma/client";
 
 export default async function AdminOverviewPage() {
-  const [ownerCount, pitchCount, statusCounts, confirmedValue] = await Promise.all([
+  const [ownerCount, pitchCount, statusCounts, confirmedValue, recentBookings] = await Promise.all([
     prisma.owner.count({ where: { role: "OWNER" } }),
     prisma.pitch.count(),
     prisma.booking.groupBy({ by: ["status"], _count: { _all: true } }),
@@ -15,6 +18,11 @@ export default async function AdminOverviewPage() {
       where: { status: BookingStatus.CONFIRMED },
       _sum: { totalPrice: true },
       _count: { _all: true },
+    }),
+    prisma.booking.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 6,
+      include: { pitch: { select: { name: true } } },
     }),
   ]);
 
@@ -93,6 +101,43 @@ export default async function AdminOverviewPage() {
           )}
           <p className="mt-2 text-xs text-zinc-400">Paid in cash at the pitch, across every owner.</p>
         </div>
+      </div>
+
+      <div className="animate-fade-in-up mt-6 rounded-2xl border border-zinc-200 bg-white p-5 [animation-delay:320ms]">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-display flex items-center gap-2 text-sm font-bold text-zinc-900">
+            <Clock className="size-4 text-indigo-600" />
+            Recent bookings
+          </h2>
+          <Link
+            href="/admin/bookings"
+            className="group flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+          >
+            View all
+            <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
+
+        {recentBookings.length === 0 ? (
+          <p className="mt-4 py-6 text-center text-sm text-zinc-500">No bookings on the platform yet.</p>
+        ) : (
+          <ul className="mt-3 flex flex-col divide-y divide-zinc-100">
+            {recentBookings.map((b) => (
+              <li key={b.id} className="flex items-center justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-zinc-900">{b.pitch.name}</p>
+                  <p className="mt-0.5 truncate text-xs text-zinc-500">
+                    {b.customerName} · {formatDateLong(b.date.toISOString().slice(0, 10))} ·{" "}
+                    {formatTimeRangeShort(b.startTime, b.endTime)}
+                  </p>
+                </div>
+                <div className="shrink-0">
+                  <BookingStatusBadge status={b.status} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

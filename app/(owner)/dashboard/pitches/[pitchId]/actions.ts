@@ -120,3 +120,31 @@ export async function removeBlockedSlot(blockedSlotId: string): Promise<void> {
   await prisma.blockedSlot.delete({ where: { id: blockedSlotId } });
   revalidatePitchPaths(slot.pitchId);
 }
+
+/**
+ * Toggles a single weekly-recurring slot for a regular group's standing time
+ * — creates it if it's currently open, deletes it if it's already blocked.
+ */
+export async function toggleRecurringBlockedSlot(
+  pitchId: string,
+  dayOfWeek: number,
+  startTime: string,
+  endTime: string,
+): Promise<void> {
+  const owner = await requireOwner();
+  await getAccessiblePitch(owner, pitchId);
+
+  if (dayOfWeek < 0 || dayOfWeek > 6) throw new Error("Invalid day of week.");
+
+  const existing = await prisma.recurringBlockedSlot.findUnique({
+    where: { pitchId_dayOfWeek_startTime: { pitchId, dayOfWeek, startTime } },
+  });
+
+  if (existing) {
+    await prisma.recurringBlockedSlot.delete({ where: { id: existing.id } });
+  } else {
+    await prisma.recurringBlockedSlot.create({ data: { pitchId, dayOfWeek, startTime, endTime } });
+  }
+
+  revalidatePitchPaths(pitchId);
+}

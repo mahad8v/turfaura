@@ -1,33 +1,54 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ArrowRight, ChevronLeft, ShieldUser, Ban, CircleCheck } from "lucide-react";
-import { prisma } from "@/lib/prisma";
-import { requireOwner } from "@/lib/auth";
-import { PitchForm } from "@/components/owner/PitchForm";
-import { PhotoManager } from "@/components/owner/PhotoManager";
-import { BlockedSlotManager } from "@/components/owner/BlockedSlotManager";
-import { ToggleButton } from "@/components/shared/ToggleButton";
-import { updatePitch, toggleActive, addPhotoRecord, deletePhoto, addBlockedSlot, removeBlockedSlot } from "./actions";
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import {
+  ArrowRight,
+  ChevronLeft,
+  ShieldUser,
+  Ban,
+  CircleCheck,
+} from 'lucide-react';
+import { prisma } from '@/lib/prisma';
+import { requireOwner } from '@/lib/auth';
+import { PitchForm } from '@/components/owner/PitchForm';
+import { PhotoManager } from '@/components/owner/PhotoManager';
+import { BlockedSlotManager } from '@/components/owner/BlockedSlotManager';
+import { ToggleButton } from '@/components/shared/ToggleButton';
+import {
+  updatePitch,
+  toggleActive,
+  addPhotoRecord,
+  deletePhoto,
+  addBlockedSlot,
+  removeBlockedSlot,
+  toggleRecurringBlockedSlot,
+} from './actions';
 
-export default async function EditPitchPage({ params }: { params: Promise<{ pitchId: string }> }) {
+export default async function EditPitchPage({
+  params,
+}: {
+  params: Promise<{ pitchId: string }>;
+}) {
   const { pitchId } = await params;
   const owner = await requireOwner();
-  const isAdmin = owner.role === "ADMIN";
+  const isAdmin = owner.role === 'ADMIN';
 
   const pitch = await prisma.pitch.findFirst({
     where: isAdmin ? { id: pitchId } : { id: pitchId, ownerId: owner.id },
     include: {
       owner: { select: { name: true } },
-      photos: { orderBy: { sortOrder: "asc" } },
-      blockedSlots: { orderBy: { date: "asc" } },
+      photos: { orderBy: { sortOrder: 'asc' } },
+      blockedSlots: { orderBy: { date: 'asc' } },
+      recurringBlockedSlots: { orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }] },
     },
   });
 
   if (!pitch) notFound();
 
   const editingSomeoneElses = isAdmin && pitch.ownerId !== owner.id;
-  const bookingsHref = isAdmin ? `/admin/bookings?pitchId=${pitch.id}` : `/dashboard/bookings?pitchId=${pitch.id}`;
-  const backHref = editingSomeoneElses ? "/admin/pitches" : "/dashboard";
+  const bookingsHref = isAdmin
+    ? `/admin/bookings?pitchId=${pitch.id}`
+    : `/dashboard/bookings?pitchId=${pitch.id}`;
+  const backHref = editingSomeoneElses ? '/admin/pitches' : '/dashboard';
 
   return (
     <div className="max-w-2xl">
@@ -42,13 +63,16 @@ export default async function EditPitchPage({ params }: { params: Promise<{ pitc
       {editingSomeoneElses && (
         <div className="mb-5 flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2.5 text-sm text-indigo-700">
           <ShieldUser className="size-4 shrink-0" />
-          Editing as admin — this pitch belongs to <span className="font-medium">{pitch.owner.name}</span>.
+          Editing as admin — this pitch belongs to{' '}
+          <span className="font-medium">{pitch.owner.name}</span>.
         </div>
       )}
 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="font-display truncate text-xl font-bold text-zinc-900">{pitch.name}</h1>
+          <h1 className="font-display truncate text-xl font-bold text-zinc-900">
+            {pitch.name}
+          </h1>
           <Link
             href={bookingsHref}
             className="group mt-1 inline-flex items-center gap-1 text-sm font-medium text-emerald-700 hover:text-emerald-800"
@@ -102,6 +126,9 @@ export default async function EditPitchPage({ params }: { params: Promise<{ pitc
       <div className="mt-5">
         <BlockedSlotManager
           pitchId={pitch.id}
+          openTime={pitch.openTime}
+          closeTime={pitch.closeTime}
+          slotDurationMinutes={pitch.slotDurationMinutes}
           blockedSlots={pitch.blockedSlots.map((s) => ({
             id: s.id,
             date: s.date.toISOString().slice(0, 10),
@@ -109,8 +136,10 @@ export default async function EditPitchPage({ params }: { params: Promise<{ pitc
             endTime: s.endTime,
             reason: s.reason,
           }))}
+          recurringBlockedSlots={pitch.recurringBlockedSlots}
           addBlockedSlot={addBlockedSlot}
           removeBlockedSlot={removeBlockedSlot}
+          toggleRecurringBlockedSlot={toggleRecurringBlockedSlot}
         />
       </div>
     </div>

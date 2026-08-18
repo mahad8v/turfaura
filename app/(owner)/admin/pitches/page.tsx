@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { MapPinned, Pencil, Ban, CircleCheck } from "lucide-react";
+import { MapPinned, Ban, CircleCheck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Money } from "@/components/shared/Money";
 import { ToggleButton } from "@/components/shared/ToggleButton";
@@ -20,7 +19,7 @@ export default async function AdminPitchesPage() {
         <div>
           <h1 className="font-display text-xl font-bold text-zinc-900">All pitches</h1>
           <p className="text-sm text-zinc-500">
-            {pitches.length} pitches across every owner. Edit pricing, schedule, blocked dates, and photos directly.
+            {pitches.length} pitches across every owner. Activate or deactivate listings platform-wide.
           </p>
         </div>
       </div>
@@ -60,14 +59,7 @@ export default async function AdminPitchesPage() {
               </span>
               <span className="text-xs text-zinc-500">{pitch._count.bookings} bookings</span>
             </div>
-            <div className="mt-3 flex items-center gap-2">
-              <Link
-                href={`/dashboard/pitches/${pitch.id}`}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-50"
-              >
-                <Pencil className="size-3.5" />
-                Edit
-              </Link>
+            <div className="mt-3">
               <ToggleButton
                 id={pitch.id}
                 active={pitch.isActive}
@@ -132,14 +124,7 @@ export default async function AdminPitchesPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3.5">
-                  <div className="flex flex-col items-end gap-2">
-                    <Link
-                      href={`/dashboard/pitches/${pitch.id}`}
-                      className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-50"
-                    >
-                      <Pencil className="size-3.5" />
-                      Edit
-                    </Link>
+                  <div className="flex justify-end">
                     <ToggleButton
                       id={pitch.id}
                       active={pitch.isActive}

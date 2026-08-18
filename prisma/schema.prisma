@@ -83,9 +83,10 @@ model Pitch {
 
   isActive Boolean @default(true)
 
-  priceOverrides PriceOverride[]
-  blockedSlots   BlockedSlot[]
-  bookings       Booking[]
+  priceOverrides        PriceOverride[]
+  blockedSlots          BlockedSlot[]
+  recurringBlockedSlots RecurringBlockedSlot[]
+  bookings              Booking[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -131,6 +132,24 @@ model BlockedSlot {
   createdAt DateTime @default(now())
 
   @@index([pitchId, date])
+}
+
+// A weekly-recurring block — e.g. "every Monday 6-8pm" for a regular group's
+// standing slot — as opposed to BlockedSlot's one-off specific date. Applied
+// on top of BlockedSlot in availability checks, matched by day of week.
+model RecurringBlockedSlot {
+  id        String   @id @default(uuid())
+  pitchId   String
+  pitch     Pitch    @relation(fields: [pitchId], references: [id], onDelete: Cascade)
+  dayOfWeek Int // 0 = Sunday .. 6 = Saturday, matches Date#getUTCDay()
+  startTime String // "HH:mm"
+  endTime   String // "HH:mm"
+  reason    String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([pitchId, dayOfWeek, startTime])
+  @@index([pitchId, dayOfWeek])
 }
 
 // Double-booking protection lives outside this file: a Postgres EXCLUDE
