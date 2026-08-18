@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { Search, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { PitchCard } from '@/components/pitch/PitchCard';
 import { FilterModal } from '@/components/pitch/FilterModal';
+import { SearchBar } from '@/components/pitch/SearchBar';
 import { PITCH_TYPE_OPTIONS } from '@/lib/pitch-type';
 import { getAvailability } from '@/lib/availability';
 import type { PitchType } from '@/generated/prisma/client';
@@ -122,42 +123,15 @@ export default async function HomePage({
               you play.
             </p>
 
-            <form
-              action="/"
-              className="animate-fade-in-up mt-6 flex max-w-md items-center gap-2 rounded-2xl bg-white p-1.5 shadow-lg [animation-delay:220ms]"
-            >
-              <Search className="ml-2 size-4 shrink-0 text-zinc-400" />
-              <input
-                type="search"
-                name="q"
-                defaultValue={query}
-                placeholder="Pitch name or neighbourhood…"
-                className="min-w-0 flex-1 bg-transparent px-1 py-2.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
-              />
-              {area && <input type="hidden" name="area" value={area} />}
-              {validType && (
-                <input type="hidden" name="type" value={validType} />
-              )}
-              {minPrice && (
-                <input type="hidden" name="minPrice" value={minPrice} />
-              )}
-              {maxPrice && (
-                <input type="hidden" name="maxPrice" value={maxPrice} />
-              )}
-              {validDate && (
-                <input type="hidden" name="date" value={validDate} />
-              )}
-              {validTime && (
-                <input type="hidden" name="time" value={validTime} />
-              )}
-              <button
-                type="submit"
-                aria-label="Search"
-                className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white transition-all hover:bg-emerald-400 active:scale-95"
-              >
-                <Search className="size-4" />
-              </button>
-            </form>
+            <SearchBar
+              query={query}
+              area={area}
+              type={validType}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              date={validDate}
+              time={validTime}
+            />
           </div>
         </div>
       </section>

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { SlidersHorizontal, X } from "lucide-react";
 import { TextField } from "@/components/shared/fields";
 import { Button } from "@/components/shared/Button";
@@ -19,15 +21,27 @@ interface FilterModalProps {
 }
 
 export function FilterModal({ q, area, type, minPrice, maxPrice, date, time, activeCount }: FilterModalProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<PitchType | undefined>(type);
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const params = new URLSearchParams();
+    for (const [key, value] of formData.entries()) {
+      if (typeof value === "string" && value) params.set(key, value);
+    }
+    setOpen(false);
+    router.push(params.size > 0 ? `/?${params.toString()}` : "/");
+  }
 
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-left shadow-sm transition-colors hover:border-zinc-300 hover:bg-zinc-50"
+        className="flex w-full items-center justify-between rounded-full border border-zinc-200 bg-white px-4 py-3 text-left transition-colors hover:border-zinc-300 hover:bg-zinc-50"
       >
         <span className="flex items-center gap-2 text-sm font-medium text-zinc-700">
           <SlidersHorizontal className="size-4 text-emerald-600" />
@@ -58,13 +72,13 @@ export function FilterModal({ q, area, type, minPrice, maxPrice, date, time, act
               type="button"
               onClick={() => setOpen(false)}
               aria-label="Close filters"
-              className="flex size-8 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100"
+              className="flex size-8 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-100"
             >
               <X className="size-4" />
             </button>
           </div>
 
-          <form action="/" className="mt-4 flex flex-col gap-5">
+          <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-5">
             {q && <input type="hidden" name="q" value={q} />}
             {area && <input type="hidden" name="area" value={area} />}
             <input type="hidden" name="type" value={selectedType ?? ""} />
@@ -111,12 +125,13 @@ export function FilterModal({ q, area, type, minPrice, maxPrice, date, time, act
                 Show results
               </Button>
               {activeCount > 0 && (
-                <a
+                <Link
                   href={`/${q ? `?q=${encodeURIComponent(q)}` : ""}`}
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700"
+                  onClick={() => setOpen(false)}
+                  className="rounded-full px-3 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700"
                 >
                   Clear
-                </a>
+                </Link>
               )}
             </div>
           </form>

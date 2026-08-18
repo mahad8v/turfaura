@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CalendarCheck, ListFilter, X } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { SelectField, TextField } from "@/components/shared/fields";
+import { GetFilterForm } from "@/components/shared/GetFilterForm";
 import { Button } from "@/components/shared/Button";
 import { BookingsTable } from "@/components/owner/BookingsTable";
 import { formatDateLong, toDateStr } from "@/lib/format";
@@ -82,10 +83,7 @@ export default async function AdminBookingsPage({
         </p>
       )}
 
-      <form
-        method="get"
-        className="mt-4 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm sm:p-5"
-      >
+      <GetFilterForm basePath="/admin/bookings" className="mt-4 rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5">
         <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-zinc-400">
           <ListFilter className="size-3.5" />
           Filters
@@ -128,7 +126,7 @@ export default async function AdminBookingsPage({
             Filter
           </Button>
         </div>
-      </form>
+      </GetFilterForm>
 
       <div className="mt-6">
         <BookingsTable bookings={rows} approveBooking={approveBooking} cancelBooking={ownerCancelBooking} />
