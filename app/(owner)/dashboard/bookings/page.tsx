@@ -1,11 +1,9 @@
 import Link from "next/link";
-import { ListFilter, X, MapPinned } from "lucide-react";
+import { X, MapPinned } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getOwnerWithActivePitch } from "@/lib/active-pitch";
 import { BookingsTable } from "@/components/owner/BookingsTable";
-import { SelectField, TextField } from "@/components/shared/fields";
-import { GetFilterForm } from "@/components/shared/GetFilterForm";
-import { Button } from "@/components/shared/Button";
+import { BookingsFilterModal } from "@/components/owner/BookingsFilterModal";
 import { formatDateLong, toDateStr } from "@/lib/format";
 import { BookingStatus } from "@/generated/prisma/client";
 import { approveBooking, ownerCancelBooking } from "./actions";
@@ -83,25 +81,14 @@ export default async function BookingsPage({
         </p>
       )}
 
-      <GetFilterForm
-        basePath="/dashboard/bookings"
-        className="mt-4 flex flex-wrap items-end gap-3 rounded-2xl border border-zinc-200 bg-white p-4"
-      >
-        <div className="min-w-44">
-          <SelectField label="Status" name="status" defaultValue={validStatus ?? ""}>
-            <option value="">All statuses</option>
-            {STATUS_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </SelectField>
-        </div>
-        <TextField label="Date" name="date" type="date" defaultValue={validDate} />
-        <Button type="submit" variant="secondary" icon={<ListFilter className="size-3.5" />}>
-          Filter
-        </Button>
-      </GetFilterForm>
+      <div className="mt-4">
+        <BookingsFilterModal
+          basePath="/dashboard/bookings"
+          status={validStatus}
+          date={validDate}
+          statusOptions={STATUS_OPTIONS}
+        />
+      </div>
 
       <div className="mt-6">
         <BookingsTable bookings={rows} approveBooking={approveBooking} cancelBooking={ownerCancelBooking} />

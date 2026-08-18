@@ -1,32 +1,41 @@
-import Link from "next/link";
-import { Users, MapPinned, CalendarCheck, Clock, HandCoins, ShieldCheck, TrendingUp, ArrowRight } from "lucide-react";
-import { prisma } from "@/lib/prisma";
-import { Money } from "@/components/shared/Money";
-import { StatCard } from "@/components/shared/StatCard";
-import { StatusDistributionBar } from "@/components/shared/StatusDistributionBar";
-import { BookingStatusBadge } from "@/components/shared/StatusBadge";
-import { formatDateLong, formatTimeRangeShort } from "@/lib/format";
-import { BookingStatus } from "@/generated/prisma/client";
+import Link from 'next/link';
+import {
+  Users,
+  CalendarCheck,
+  Clock,
+  HandCoins,
+  ShieldCheck,
+  TrendingUp,
+  ArrowRight,
+} from 'lucide-react';
+import { prisma } from '@/lib/prisma';
+import { Money } from '@/components/shared/Money';
+import { StatCard } from '@/components/shared/StatCard';
+import { StatusDistributionBar } from '@/components/shared/StatusDistributionBar';
+import { BookingStatusBadge } from '@/components/shared/StatusBadge';
+import { formatDateLong, formatTimeRangeShort } from '@/lib/format';
+import { BookingStatus } from '@/generated/prisma/client';
 
 export default async function AdminOverviewPage() {
-  const [ownerCount, pitchCount, statusCounts, confirmedValue, recentBookings] = await Promise.all([
-    prisma.owner.count({ where: { role: "OWNER" } }),
-    prisma.pitch.count(),
-    prisma.booking.groupBy({ by: ["status"], _count: { _all: true } }),
-    prisma.booking.groupBy({
-      by: ["currency"],
-      where: { status: BookingStatus.CONFIRMED },
-      _sum: { totalPrice: true },
-      _count: { _all: true },
-    }),
-    prisma.booking.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 6,
-      include: { pitch: { select: { name: true } } },
-    }),
-  ]);
+  const [ownerCount, statusCounts, confirmedValue, recentBookings] =
+    await Promise.all([
+      prisma.owner.count({ where: { role: 'OWNER' } }),
+      prisma.booking.groupBy({ by: ['status'], _count: { _all: true } }),
+      prisma.booking.groupBy({
+        by: ['currency'],
+        where: { status: BookingStatus.CONFIRMED },
+        _sum: { totalPrice: true },
+        _count: { _all: true },
+      }),
+      prisma.booking.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 6,
+        include: { pitch: { select: { name: true } } },
+      }),
+    ]);
 
-  const countFor = (status: BookingStatus) => statusCounts.find((s) => s.status === status)?._count._all ?? 0;
+  const countFor = (status: BookingStatus) =>
+    statusCounts.find((s) => s.status === status)?._count._all ?? 0;
   const totalBookings = statusCounts.reduce((sum, s) => sum + s._count._all, 0);
 
   const statusOrder = [
@@ -56,10 +65,19 @@ export default async function AdminOverviewPage() {
         </div>
       </div>
 
-      <div className="animate-fade-in-up relative z-10 -mt-8 grid gap-4 px-1 sm:grid-cols-2 lg:grid-cols-4 [animation-delay:200ms]">
-        <StatCard icon={Users} label="Pitch owners" value={String(ownerCount)} accent="indigo" />
-        <StatCard icon={MapPinned} label="Pitches listed" value={String(pitchCount)} accent="indigo" />
-        <StatCard icon={CalendarCheck} label="Total bookings" value={String(totalBookings)} accent="indigo" />
+      <div className="animate-fade-in-up relative z-10 -mt-8 grid gap-4 px-1 sm:grid-cols-3 [animation-delay:200ms]">
+        <StatCard
+          icon={Users}
+          label="Pitch owners"
+          value={String(ownerCount)}
+          accent="indigo"
+        />
+        <StatCard
+          icon={CalendarCheck}
+          label="Total bookings"
+          value={String(totalBookings)}
+          accent="indigo"
+        />
         <StatCard
           icon={Clock}
           label="Needs attention"
@@ -76,7 +94,12 @@ export default async function AdminOverviewPage() {
             Bookings by status
           </h2>
           <div className="mt-4">
-            <StatusDistributionBar counts={statusOrder.map((status) => ({ status, count: countFor(status) }))} />
+            <StatusDistributionBar
+              counts={statusOrder.map((status) => ({
+                status,
+                count: countFor(status),
+              }))}
+            />
           </div>
         </div>
 
@@ -88,18 +111,30 @@ export default async function AdminOverviewPage() {
           {confirmedValue.length > 0 ? (
             <div className="mt-1 flex flex-col gap-2">
               {confirmedValue.map((row) => (
-                <div key={row.currency} className="flex items-baseline justify-between gap-2">
+                <div
+                  key={row.currency}
+                  className="flex items-baseline justify-between gap-2"
+                >
                   <p className="font-display text-2xl font-extrabold tracking-tight text-zinc-900">
-                    <Money amount={row._sum.totalPrice?.toString() ?? "0"} currency={row.currency} />
+                    <Money
+                      amount={row._sum.totalPrice?.toString() ?? '0'}
+                      currency={row.currency}
+                    />
                   </p>
-                  <p className="shrink-0 text-xs text-zinc-400">{row._count._all} bookings</p>
+                  <p className="shrink-0 text-xs text-zinc-400">
+                    {row._count._all} bookings
+                  </p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="font-display mt-1 text-2xl font-extrabold tracking-tight text-zinc-300">—</p>
+            <p className="font-display mt-1 text-2xl font-extrabold tracking-tight text-zinc-300">
+              —
+            </p>
           )}
-          <p className="mt-2 text-xs text-zinc-400">Paid in cash at the pitch, across every owner.</p>
+          <p className="mt-2 text-xs text-zinc-400">
+            Paid in cash at the pitch, across every owner.
+          </p>
         </div>
       </div>
 
@@ -119,15 +154,23 @@ export default async function AdminOverviewPage() {
         </div>
 
         {recentBookings.length === 0 ? (
-          <p className="mt-4 py-6 text-center text-sm text-zinc-500">No bookings on the platform yet.</p>
+          <p className="mt-4 py-6 text-center text-sm text-zinc-500">
+            No bookings on the platform yet.
+          </p>
         ) : (
           <ul className="mt-3 flex flex-col divide-y divide-zinc-100">
             {recentBookings.map((b) => (
-              <li key={b.id} className="flex items-center justify-between gap-3 py-3">
+              <li
+                key={b.id}
+                className="flex items-center justify-between gap-3 py-3"
+              >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-zinc-900">{b.pitch.name}</p>
+                  <p className="truncate text-sm font-medium text-zinc-900">
+                    {b.pitch.name}
+                  </p>
                   <p className="mt-0.5 truncate text-xs text-zinc-500">
-                    {b.customerName} · {formatDateLong(b.date.toISOString().slice(0, 10))} ·{" "}
+                    {b.customerName} ·{' '}
+                    {formatDateLong(b.date.toISOString().slice(0, 10))} ·{' '}
                     {formatTimeRangeShort(b.startTime, b.endTime)}
                   </p>
                 </div>

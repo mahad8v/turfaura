@@ -1,9 +1,7 @@
 import Link from "next/link";
-import { CalendarCheck, ListFilter, X } from "lucide-react";
+import { CalendarCheck, X } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { SelectField, TextField } from "@/components/shared/fields";
-import { GetFilterForm } from "@/components/shared/GetFilterForm";
-import { Button } from "@/components/shared/Button";
+import { BookingsFilterModal } from "@/components/owner/BookingsFilterModal";
 import { BookingsTable } from "@/components/owner/BookingsTable";
 import { formatDateLong, toDateStr } from "@/lib/format";
 import { BookingStatus } from "@/generated/prisma/client";
@@ -83,50 +81,18 @@ export default async function AdminBookingsPage({
         </p>
       )}
 
-      <GetFilterForm basePath="/admin/bookings" className="mt-4 rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5">
-        <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-zinc-400">
-          <ListFilter className="size-3.5" />
-          Filters
-        </p>
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-44 flex-1">
-            <SelectField label="Owner" name="ownerId" defaultValue={ownerId ?? ""}>
-              <option value="">All owners</option>
-              {owners.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.name}
-                </option>
-              ))}
-            </SelectField>
-          </div>
-          <div className="min-w-44 flex-1">
-            <SelectField label="Pitch" name="pitchId" defaultValue={pitchId ?? ""}>
-              <option value="">All pitches</option>
-              {pitches.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </SelectField>
-          </div>
-          <div className="min-w-44 flex-1">
-            <SelectField label="Status" name="status" defaultValue={validStatus ?? ""}>
-              <option value="">All statuses</option>
-              {STATUS_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </SelectField>
-          </div>
-          <div className="min-w-36">
-            <TextField label="Date" name="date" type="date" defaultValue={validDate} />
-          </div>
-          <Button type="submit" variant="secondary" icon={<ListFilter className="size-3.5" />}>
-            Filter
-          </Button>
-        </div>
-      </GetFilterForm>
+      <div className="mt-4">
+        <BookingsFilterModal
+          basePath="/admin/bookings"
+          status={validStatus}
+          date={validDate}
+          statusOptions={STATUS_OPTIONS}
+          owners={owners}
+          ownerId={ownerId}
+          pitches={pitches}
+          pitchId={pitchId}
+        />
+      </div>
 
       <div className="mt-6">
         <BookingsTable bookings={rows} approveBooking={approveBooking} cancelBooking={ownerCancelBooking} />

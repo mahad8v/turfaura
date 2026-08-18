@@ -1,23 +1,19 @@
 import Link from "next/link";
-import Image from "next/image";
 import {
   Plus,
   MapPinned,
-  ImageOff,
   ImageIcon,
   CalendarCheck2,
-  Ban,
   Clock,
   CircleCheckBig,
-  ChevronRight,
-  Settings,
+  ArrowRight,
 } from "lucide-react";
 import { getOwnerWithActivePitch } from "@/lib/active-pitch";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/shared/Button";
-import { Money } from "@/components/shared/Money";
 import { StatCard } from "@/components/shared/StatCard";
-import { getPitchPhotoUrl } from "@/lib/storage";
+import { BookingStatusBadge } from "@/components/shared/StatusBadge";
+import { formatDateLong, formatTimeRangeShort, toDateStr } from "@/lib/format";
 import { BookingStatus } from "@/generated/prisma/client";
 
 export default async function DashboardPage() {
@@ -41,13 +37,13 @@ export default async function DashboardPage() {
     );
   }
 
-  const [statusCounts, photoCount, firstPhoto] = await Promise.all([
+  const [statusCounts, photoCount, recentBookings] = await Promise.all([
     prisma.booking.groupBy({ by: ["status"], where: { pitchId: activePitch.id }, _count: { _all: true } }),
     prisma.pitchPhoto.count({ where: { pitchId: activePitch.id } }),
-    prisma.pitchPhoto.findFirst({
+    prisma.booking.findMany({
       where: { pitchId: activePitch.id },
-      orderBy: { sortOrder: "asc" },
-      select: { storagePath: true },
+      orderBy: { createdAt: "desc" },
+      take: 6,
     }),
   ]);
 
@@ -88,63 +84,41 @@ export default async function DashboardPage() {
         <StatCard icon={ImageIcon} label="Photos" value={String(photoCount)} />
       </div>
 
-      <h2 className="font-display mt-8 text-sm font-bold text-zinc-900">This turf</h2>
-      <Link
-        href={`/dashboard/pitches/${activePitch.id}`}
-        className="group mt-3 flex max-w-2xl items-center gap-3 rounded-2xl border border-zinc-200 bg-white p-3 transition-all duration-150 active:scale-[0.98] active:bg-zinc-50 sm:hover:-translate-y-0.5 sm:hover:border-zinc-300"
-      >
-        <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-zinc-100">
-          {firstPhoto ? (
-            <Image
-              src={getPitchPhotoUrl(firstPhoto.storagePath)}
-              alt=""
-              fill
-              className="object-cover"
-              sizes="64px"
-              unoptimized
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center text-zinc-300">
-              <ImageOff className="size-5" strokeWidth={1.5} />
-            </div>
-          )}
-          {!activePitch.isActive && (
-            <span className="absolute inset-0 flex items-center justify-center bg-black/45">
-              <Ban className="size-4 text-white" />
-            </span>
-          )}
+      <div className="mt-8 rounded-2xl border border-zinc-200 bg-white p-5">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-display flex items-center gap-2 text-sm font-bold text-zinc-900">
+            <Clock className="size-4 text-emerald-600" />
+            Recent bookings
+          </h2>
+          <Link
+            href="/dashboard/bookings"
+            className="group flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-800"
+          >
+            View all
+            <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+          </Link>
         </div>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <h3 className="truncate font-display font-semibold text-zinc-900 group-hover:text-emerald-700">
-              {activePitch.name}
-            </h3>
-            {!activePitch.isActive && (
-              <span className="shrink-0 rounded-full bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500">
-                Inactive
-              </span>
-            )}
-          </div>
-          <p className="truncate text-xs text-zinc-500">{activePitch.address}</p>
-          <p className="mt-1 text-xs font-medium text-zinc-700">
-            <Money amount={activePitch.basePricePerHour.toString()} currency={activePitch.currency} />
-            <span className="font-normal text-zinc-400"> /hr · tap to manage</span>
-          </p>
-        </div>
-
-        <ChevronRight className="size-4 shrink-0 text-zinc-300 transition-transform group-hover:translate-x-0.5" />
-      </Link>
-
-      {pitches.length > 1 && (
-        <Link
-          href="/dashboard/settings"
-          className="mt-3 flex max-w-2xl items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-700"
-        >
-          <Settings className="size-3.5" />
-          You have {pitches.length} turfs — switch which one you&apos;re managing in Settings
-        </Link>
-      )}
+        {recentBookings.length === 0 ? (
+          <p className="mt-4 py-6 text-center text-sm text-zinc-500">No bookings yet for this turf.</p>
+        ) : (
+          <ul className="mt-3 flex flex-col divide-y divide-zinc-100">
+            {recentBookings.map((b) => (
+              <li key={b.id} className="flex items-center justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-zinc-900">{b.customerName}</p>
+                  <p className="mt-0.5 truncate text-xs text-zinc-500">
+                    {formatDateLong(toDateStr(b.date))} · {formatTimeRangeShort(b.startTime, b.endTime)}
+                  </p>
+                </div>
+                <div className="shrink-0">
+                  <BookingStatusBadge status={b.status} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
