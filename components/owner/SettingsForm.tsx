@@ -1,10 +1,12 @@
 "use client";
 
 import { useActionState } from "react";
-import { User, Save, CircleAlert, CircleCheck, Send } from "lucide-react";
+import Link from "next/link";
+import { User, Save, CircleAlert, CircleCheck, Send, MapPinned, Plus } from "lucide-react";
 import { TextField } from "@/components/shared/fields";
 import { Button } from "@/components/shared/Button";
 import { TelegramConnect } from "@/components/owner/TelegramConnect";
+import { TurfSwitcher, type SwitchableTurf } from "@/components/owner/TurfSwitcher";
 import type { SettingsFormState } from "@/app/(owner)/dashboard/settings/actions";
 
 function SectionHeader({ icon: Icon, title }: { icon: typeof User; title: string }) {
@@ -30,6 +32,9 @@ export function SettingsForm({
   telegramConnected,
   getTelegramConnectUrl,
   disconnectTelegram,
+  turfs,
+  activeTurfId,
+  setActivePitch,
 }: {
   action: (prevState: SettingsFormState | null, formData: FormData) => Promise<SettingsFormState>;
   defaults: SettingsFormDefaults;
@@ -37,13 +42,31 @@ export function SettingsForm({
   telegramConnected: boolean;
   getTelegramConnectUrl: () => Promise<string>;
   disconnectTelegram: () => Promise<void>;
+  turfs: SwitchableTurf[];
+  activeTurfId: string;
+  setActivePitch: (pitchId: string) => Promise<void>;
 }) {
   const [state, formAction, pending] = useActionState(action, null);
 
   return (
     <div className="flex flex-col gap-5">
+      <section className="grid gap-3 rounded-2xl border border-zinc-200 bg-white p-5">
+        <div className="col-span-full flex items-center justify-between gap-3">
+          <SectionHeader icon={MapPinned} title="Active turf" />
+          <Link href="/dashboard/pitches/new">
+            <Button type="button" variant="secondary" size="sm" icon={<Plus className="size-3.5" />}>
+              Add a turf
+            </Button>
+          </Link>
+        </div>
+        <p className="-mt-2 text-xs text-zinc-500">
+          Your dashboard — bookings, calendar, and earnings — is scoped to this turf. Switch anytime.
+        </p>
+        <TurfSwitcher turfs={turfs} activeTurfId={activeTurfId} setActivePitch={setActivePitch} />
+      </section>
+
       <form action={formAction} className="flex flex-col gap-5">
-        <section className="grid gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:grid-cols-2">
+        <section className="grid gap-4 rounded-2xl border border-zinc-200 bg-white p-5 sm:grid-cols-2">
           <SectionHeader icon={User} title="Profile" />
           <TextField label="Full name" name="name" defaultValue={defaults.name} required />
           <TextField
@@ -75,7 +98,7 @@ export function SettingsForm({
         </div>
       </form>
 
-      <section className="grid gap-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+      <section className="grid gap-3 rounded-2xl border border-zinc-200 bg-white p-5">
         <SectionHeader icon={Send} title="Telegram notifications" />
         <p className="col-span-full -mt-2 text-xs text-zinc-500">
           Get an instant Telegram message whenever a customer requests a booking on one of your pitches.

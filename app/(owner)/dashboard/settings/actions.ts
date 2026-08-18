@@ -45,3 +45,18 @@ export async function disconnectTelegram(): Promise<void> {
   await prisma.owner.update({ where: { id: owner.id }, data: { telegramChatId: null, telegramLinkToken: null } });
   revalidatePath("/dashboard/settings");
 }
+
+/** Switches which turf the dashboard is scoped to. */
+export async function setActivePitch(pitchId: string): Promise<void> {
+  const owner = await requireOwner();
+  const pitch = await prisma.pitch.findFirst({ where: { id: pitchId, ownerId: owner.id }, select: { id: true } });
+  if (!pitch) throw new Error("That turf isn't on your account.");
+
+  await prisma.owner.update({ where: { id: owner.id }, data: { activePitchId: pitchId } });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard/bookings");
+  revalidatePath("/dashboard/calendar");
+  revalidatePath("/dashboard/earnings");
+}

@@ -46,5 +46,9 @@ export async function createPitch(_prevState: PitchFormState | null, formData: F
     },
   });
 
+  // A freshly created turf becomes the one the dashboard is scoped to —
+  // same "switch into what you just made" behavior as adding a new store.
+  await prisma.owner.update({ where: { id: owner.id }, data: { activePitchId: pitch.id } });
+
   redirect(`/dashboard/pitches/${pitch.id}`);
 }

@@ -1,4 +1,5 @@
-import { requireOwner } from "@/lib/auth";
+import { MapPinned } from "lucide-react";
+import { getOwnerWithActivePitch } from "@/lib/active-pitch";
 import { prisma } from "@/lib/prisma";
 import { BookingCalendar, type CalendarDayData } from "@/components/shared/BookingCalendar";
 import { BookingStatus } from "@/generated/prisma/client";
@@ -17,9 +18,23 @@ export default async function OwnerCalendarPage({
 }: {
   searchParams: Promise<{ month?: string }>;
 }) {
-  const owner = await requireOwner();
+  const { activePitch } = await getOwnerWithActivePitch();
   const { month: monthParam } = await searchParams;
   const { year, month } = parseMonthParam(monthParam);
+
+  if (!activePitch) {
+    return (
+      <div>
+        <h1 className="font-display text-xl font-bold text-zinc-900">Calendar</h1>
+        <div className="mt-6 flex flex-col items-center gap-2 rounded-2xl border border-dashed border-zinc-300 bg-white py-14 text-center">
+          <span className="flex size-11 items-center justify-center rounded-full bg-zinc-100 text-zinc-400">
+            <MapPinned className="size-5" strokeWidth={1.75} />
+          </span>
+          <p className="text-sm text-zinc-500">Add a turf to see its calendar.</p>
+        </div>
+      </div>
+    );
+  }
 
   const rangeStart = new Date(Date.UTC(year, month - 1, 1));
   const rangeEnd = new Date(Date.UTC(year, month, 1));
@@ -27,14 +42,14 @@ export default async function OwnerCalendarPage({
   const [bookings, blockedSlots] = await Promise.all([
     prisma.booking.findMany({
       where: {
-        pitch: { ownerId: owner.id },
+        pitchId: activePitch.id,
         date: { gte: rangeStart, lt: rangeEnd },
         status: { in: [BookingStatus.PENDING, BookingStatus.CONFIRMED] },
       },
       select: { date: true, status: true },
     }),
     prisma.blockedSlot.findMany({
-      where: { pitch: { ownerId: owner.id }, date: { gte: rangeStart, lt: rangeEnd } },
+      where: { pitchId: activePitch.id, date: { gte: rangeStart, lt: rangeEnd } },
       select: { date: true },
     }),
   ]);
@@ -58,7 +73,7 @@ export default async function OwnerCalendarPage({
   return (
     <div>
       <h1 className="font-display text-xl font-bold text-zinc-900">Calendar</h1>
-      <p className="mt-1 text-sm text-zinc-500">Bookings and blocked dates across all your pitches.</p>
+      <p className="mt-1 text-sm text-zinc-500">Bookings and blocked dates for {activePitch.name}.</p>
       <div className="mt-6 max-w-xl">
         <BookingCalendar
           year={year}

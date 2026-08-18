@@ -7,7 +7,7 @@ import { logout } from "../actions";
 import { DashboardShell, type DashboardNavItem } from "@/components/shared/DashboardShell";
 
 const NAV_ITEMS: DashboardNavItem[] = [
-  { href: "/dashboard", label: "Pitches", icon: "LayoutGrid", exact: true },
+  { href: "/dashboard", label: "Overview", icon: "LayoutDashboard", exact: true },
   { href: "/dashboard/bookings", label: "Bookings", icon: "CalendarCheck" },
   { href: "/dashboard/calendar", label: "Calendar", icon: "CalendarDays" },
   { href: "/dashboard/earnings", label: "Earnings", icon: "Wallet" },

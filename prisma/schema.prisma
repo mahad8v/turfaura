@@ -47,6 +47,12 @@ model Owner {
   telegramChatId    String? @unique
   telegramLinkToken String? @unique
 
+  // The turf the dashboard is currently scoped to (switched from Settings).
+  // Plain id, not a relation — same "soft reference" pattern as
+  // Booking.approvedBy — since an owner only ever points this at one of
+  // their own pitches, enforced at the application layer.
+  activePitchId String?
+
   pitches Pitch[]
 
   createdAt DateTime @default(now())
