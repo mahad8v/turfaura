@@ -12,7 +12,7 @@ const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/admin/pitches", label: "Pitches", icon: "MapPinned" },
   { href: "/admin/bookings", label: "Bookings", icon: "CalendarCheck" },
   { href: "/admin/calendar", label: "Calendar", icon: "CalendarDays" },
-  { href: "/dashboard/settings", label: "Settings", icon: "Settings" },
+  { href: "/dashboard/settings", label: "Account", icon: "User" },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Goal,
   LogOut,
@@ -13,7 +14,8 @@ import {
   Users,
   MapPinned,
   Settings,
-} from "lucide-react";
+  User,
+} from 'lucide-react';
 
 // Server Component layouts build the nav list, but React Server Components
 // can't pass raw component references (functions) as props into a "use
@@ -29,6 +31,7 @@ const ICONS = {
   Users,
   MapPinned,
   Settings,
+  User,
 } as const;
 
 export interface DashboardNavItem {
@@ -38,20 +41,23 @@ export interface DashboardNavItem {
   exact?: boolean;
 }
 
-type Theme = "emerald" | "indigo";
+type Theme = 'emerald' | 'indigo';
 
-const THEME: Record<Theme, { gradient: string; shadow: string; activeBg: string; activeText: string }> = {
+const THEME: Record<
+  Theme,
+  { gradient: string; shadow: string; activeBg: string; activeText: string }
+> = {
   emerald: {
-    gradient: "from-emerald-500 to-emerald-700",
-    shadow: "shadow-emerald-600/30",
-    activeBg: "bg-emerald-50",
-    activeText: "text-emerald-700",
+    gradient: 'from-emerald-500 to-emerald-700',
+    shadow: 'shadow-emerald-600/30',
+    activeBg: 'bg-emerald-50',
+    activeText: 'text-emerald-700',
   },
   indigo: {
-    gradient: "from-indigo-500 to-indigo-700",
-    shadow: "shadow-indigo-600/30",
-    activeBg: "bg-indigo-50",
-    activeText: "text-indigo-700",
+    gradient: 'from-indigo-500 to-indigo-700',
+    shadow: 'shadow-indigo-600/30',
+    activeBg: 'bg-indigo-50',
+    activeText: 'text-indigo-700',
   },
 };
 
@@ -78,9 +84,23 @@ export function DashboardShell({
 }: DashboardShellProps) {
   const pathname = usePathname();
   const t = THEME[theme];
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node))
+        setMenuOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [menuOpen]);
 
   function isActive(item: DashboardNavItem) {
-    return item.exact ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`);
+    return item.exact
+      ? pathname === item.href
+      : pathname === item.href || pathname.startsWith(`${item.href}/`);
   }
 
   const initial = userName.charAt(0).toUpperCase();
@@ -97,7 +117,8 @@ export function DashboardShell({
               <Goal className="size-4" strokeWidth={2.5} />
             </span>
             <span className="font-display text-lg font-extrabold tracking-tight text-zinc-900">
-              TurfAura <span className="font-normal text-zinc-400">{brandSubtitle}</span>
+              TurfAura{' '}
+              <span className="font-normal text-zinc-400">{brandSubtitle}</span>
             </span>
           </div>
 
@@ -110,11 +131,13 @@ export function DashboardShell({
                   key={item.href}
                   href={item.href}
                   className={`group flex items-center gap-3 rounded-full px-4 py-2.5 text-sm font-medium transition-all duration-150 ${
-                    active ? `${t.activeBg} ${t.activeText}` : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                    active
+                      ? `${t.activeBg} ${t.activeText}`
+                      : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
                   }`}
                 >
                   <Icon
-                    className={`size-4 shrink-0 transition-transform duration-150 ${active ? "" : "group-hover:scale-110"}`}
+                    className={`size-4 shrink-0 transition-transform duration-150 ${active ? '' : 'group-hover:scale-110'}`}
                   />
                   {item.label}
                 </Link>
@@ -132,8 +155,12 @@ export function DashboardShell({
                 {initial}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-zinc-900">{userName}</p>
-                {userMeta && <p className="truncate text-xs text-zinc-400">{userMeta}</p>}
+                <p className="truncate text-sm font-medium text-zinc-900">
+                  {userName}
+                </p>
+                {userMeta && (
+                  <p className="truncate text-xs text-zinc-400">{userMeta}</p>
+                )}
               </div>
             </div>
             <form action={logoutAction} className="mt-2">
@@ -157,19 +184,44 @@ export function DashboardShell({
           >
             <Goal className="size-4" strokeWidth={2.5} />
           </span>
-          <span className="font-display text-base font-extrabold text-zinc-900">TurfAura</span>
+          <span className="font-display text-base font-extrabold text-zinc-900">
+            TurfAura
+          </span>
         </div>
         <div className="flex items-center gap-1.5">
           {headerExtra}
-          <form action={logoutAction}>
+          <div ref={menuRef} className="relative">
             <button
-              type="submit"
-              aria-label="Log out"
-              className="flex size-9 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-100"
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label="Account menu"
+              className="flex size-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 transition-colors hover:bg-zinc-200"
             >
-              <LogOut className="size-4" />
+              <User className="size-4" strokeWidth={2.25} />
             </button>
-          </form>
+
+            {menuOpen && (
+              <div className="absolute right-0 z-20 mt-2 w-52 overflow-hidden rounded-2xl border border-zinc-200 bg-white py-1.5 shadow-lg">
+                <div className="border-b border-zinc-100 px-4 py-2.5">
+                  <p className="truncate text-sm font-medium text-zinc-900">
+                    {userName}
+                  </p>
+                  {userMeta && (
+                    <p className="truncate text-xs text-zinc-400">{userMeta}</p>
+                  )}
+                </div>
+                <form action={logoutAction}>
+                  <button
+                    type="submit"
+                    className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
+                  >
+                    <LogOut className="size-4" />
+                    Log out
+                  </button>
+                </form>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -187,12 +239,16 @@ export function DashboardShell({
               >
                 <span
                   className={`flex size-8 items-center justify-center rounded-full transition-all duration-150 ${
-                    active ? `${t.activeBg} ${t.activeText} scale-110` : "text-zinc-400"
+                    active
+                      ? `${t.activeBg} ${t.activeText} scale-110`
+                      : 'text-zinc-400'
                   }`}
                 >
-                  <Icon className="size-4" />
+                  <Icon className="size-6" />
                 </span>
-                <span className={`text-[10px] font-medium ${active ? t.activeText : "text-zinc-400"}`}>
+                <span
+                  className={`text-[10px] font-medium ${active ? t.activeText : 'text-zinc-400'}`}
+                >
                   {item.label}
                 </span>
               </Link>
@@ -202,7 +258,9 @@ export function DashboardShell({
       </nav>
 
       <div className="min-w-0 flex-1">
-        <main className="mx-auto max-w-6xl px-4 py-6 pb-24 sm:px-6 lg:py-8 lg:pb-8">{children}</main>
+        <main className="mx-auto max-w-6xl px-4 py-6 pb-24 sm:px-6 lg:py-8 lg:pb-8">
+          {children}
+        </main>
       </div>
     </div>
   );

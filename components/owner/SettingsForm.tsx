@@ -1,35 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
 import Link from "next/link";
-import {
-  User,
-  Save,
-  CircleAlert,
-  CircleCheck,
-  MapPinned,
-  Plus,
-  Pencil,
-  Bell,
-  LogOut,
-  ChevronRight,
-} from "lucide-react";
-import { TextField } from "@/components/shared/fields";
-import { Button } from "@/components/shared/Button";
+import { User, MapPinned, Plus, Pencil, Wallet, Bell, LogOut, ChevronRight } from "lucide-react";
 import { TelegramConnect } from "@/components/owner/TelegramConnect";
 import { TurfSwitcher, type SwitchableTurf } from "@/components/owner/TurfSwitcher";
-import type { SettingsFormState } from "@/app/(owner)/dashboard/settings/actions";
-
-function SectionHeader({ icon: Icon, title }: { icon: typeof User; title: string }) {
-  return (
-    <h2 className="flex items-center gap-2 font-display text-sm font-bold text-zinc-900">
-      <span className="flex size-6 items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
-        <Icon className="size-3.5" strokeWidth={2.25} />
-      </span>
-      {title}
-    </h2>
-  );
-}
 
 function SettingsRow({
   icon: Icon,
@@ -63,14 +37,7 @@ function SettingsRow({
   );
 }
 
-export interface SettingsFormDefaults {
-  name: string;
-  phone?: string;
-}
-
 export function SettingsForm({
-  action,
-  defaults,
   telegramConfigured,
   telegramConnected,
   getTelegramConnectUrl,
@@ -80,8 +47,6 @@ export function SettingsForm({
   setActivePitch,
   logoutAction,
 }: {
-  action: (prevState: SettingsFormState | null, formData: FormData) => Promise<SettingsFormState>;
-  defaults: SettingsFormDefaults;
   telegramConfigured: boolean;
   telegramConnected: boolean;
   getTelegramConnectUrl: () => Promise<string>;
@@ -91,7 +56,6 @@ export function SettingsForm({
   setActivePitch: (pitchId: string) => Promise<void>;
   logoutAction: () => Promise<void>;
 }) {
-  const [state, formAction, pending] = useActionState(action, null);
   const activeTurf = turfs.find((t) => t.id === activeTurfId);
 
   return (
@@ -123,6 +87,8 @@ export function SettingsForm({
             disabled={!activeTurfId}
           />
           <SettingsRow icon={Plus} label="Add a turf" href="/dashboard/pitches/new" />
+          <SettingsRow icon={User} label="Profile" href="/dashboard/settings/profile" />
+          <SettingsRow icon={Wallet} label="Earnings" href="/dashboard/earnings" />
         </div>
       </div>
 
@@ -145,39 +111,6 @@ export function SettingsForm({
           />
         </div>
       </div>
-
-      <form action={formAction} className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-5">
-        <SectionHeader icon={User} title="Profile" />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <TextField label="Full name" name="name" defaultValue={defaults.name} required />
-          <TextField
-            label="Phone"
-            name="phone"
-            type="tel"
-            defaultValue={defaults.phone}
-            hint="Your WhatsApp contact number, shown to customers on your pitch pages."
-          />
-        </div>
-
-        {state?.error && (
-          <p className="flex items-center gap-1.5 text-sm text-red-600">
-            <CircleAlert className="size-4 shrink-0" />
-            {state.error}
-          </p>
-        )}
-        {state?.success && (
-          <p className="flex items-center gap-1.5 text-sm text-emerald-700">
-            <CircleCheck className="size-4 shrink-0" />
-            Saved.
-          </p>
-        )}
-
-        <div>
-          <Button type="submit" pending={pending} pendingText="Saving…" size="md" icon={<Save className="size-4" />}>
-            Save settings
-          </Button>
-        </div>
-      </form>
 
       <form action={logoutAction} className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
         <button type="submit" className="flex w-full items-center justify-between px-4 py-3.5 transition-colors hover:bg-red-50">

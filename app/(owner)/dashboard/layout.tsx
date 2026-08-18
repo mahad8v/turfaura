@@ -10,8 +10,7 @@ const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/dashboard", label: "Overview", icon: "LayoutDashboard", exact: true },
   { href: "/dashboard/bookings", label: "Bookings", icon: "CalendarCheck" },
   { href: "/dashboard/calendar", label: "Calendar", icon: "CalendarDays" },
-  { href: "/dashboard/earnings", label: "Earnings", icon: "Wallet" },
-  { href: "/dashboard/settings", label: "Settings", icon: "Settings" },
+  { href: "/dashboard/settings", label: "Account", icon: "User" },
 ];
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {

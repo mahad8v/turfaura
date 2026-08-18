@@ -27,6 +27,7 @@ export async function updateSettings(
   });
 
   revalidatePath("/dashboard/settings");
+  revalidatePath("/dashboard/settings/profile");
   revalidatePath("/dashboard");
   return { success: true };
 }
