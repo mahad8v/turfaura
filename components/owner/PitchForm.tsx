@@ -5,6 +5,7 @@ import { MapPin, CircleDollarSign, Clock, CircleAlert } from "lucide-react";
 import { TextField, TextAreaField, SelectField } from "@/components/shared/fields";
 import { Button } from "@/components/shared/Button";
 import { PITCH_TYPE_LABELS, PITCH_TYPE_OPTIONS } from "@/lib/pitch-type";
+import type { PitchType } from "@/generated/prisma/client";
 
 export interface PitchFormState {
   error?: string;
@@ -15,7 +16,7 @@ export interface PitchFormDefaults {
   description?: string;
   address?: string;
   area?: string;
-  type?: "FIVE_A_SIDE" | "SEVEN_A_SIDE" | "ELEVEN_A_SIDE";
+  type?: PitchType;
   lat?: number;
   lng?: number;
   basePricePerHour?: string;

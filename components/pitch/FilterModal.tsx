@@ -111,11 +111,11 @@ export function FilterModal({ q, area, type, minPrice, maxPrice, date, time, act
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <TextField label="Min price" name="minPrice" type="number" min="0" defaultValue={minPrice} />
-              <TextField label="Max price" name="maxPrice" type="number" min="0" defaultValue={maxPrice} />
+              <TextField label="Min price" name="minPrice" type="number" min="0" inputSize="sm" defaultValue={minPrice} />
+              <TextField label="Max price" name="maxPrice" type="number" min="0" inputSize="sm" defaultValue={maxPrice} />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <TextField label="Date" name="date" type="date" defaultValue={date} />
               <TextField label="Time" name="time" type="time" defaultValue={time} />
             </div>

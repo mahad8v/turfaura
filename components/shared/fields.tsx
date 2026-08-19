@@ -1,8 +1,15 @@
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { ChevronDown } from "lucide-react";
 
-const inputClass =
-  "w-full rounded-full border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-all placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10";
+const inputBaseClass =
+  "w-full min-w-0 rounded-full border border-zinc-200 bg-white text-zinc-900 outline-none transition-all placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10";
+
+const inputSizeClass = {
+  md: "px-4 py-3 text-sm",
+  sm: "px-3.5 py-2 text-xs",
+} as const;
+
+type InputSize = keyof typeof inputSizeClass;
 
 const textareaClass =
   "w-full rounded-3xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-all placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10";
@@ -13,6 +20,7 @@ interface FieldWrapperProps {
   hint?: string;
   required?: boolean;
   icon?: ReactNode;
+  inputSize?: InputSize;
 }
 
 export function TextField({
@@ -21,6 +29,7 @@ export function TextField({
   hint,
   required,
   icon,
+  inputSize = "md",
   className,
   ...props
 }: FieldWrapperProps & InputHTMLAttributes<HTMLInputElement>) {
@@ -36,7 +45,7 @@ export function TextField({
           id={name}
           name={name}
           required={required}
-          className={`${inputClass} ${icon ? "pl-11" : ""} ${className ?? ""}`}
+          className={`${inputBaseClass} ${inputSizeClass[inputSize]} ${icon ? "pl-11" : ""} ${className ?? ""}`}
           {...props}
         />
       </div>
@@ -85,7 +94,7 @@ export function SelectField({
           id={name}
           name={name}
           required={required}
-          className={`${inputClass} appearance-none pr-10 ${className ?? ""}`}
+          className={`${inputBaseClass} ${inputSizeClass.md} appearance-none pr-10 ${className ?? ""}`}
           {...props}
         >
           {children}
