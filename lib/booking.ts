@@ -5,6 +5,7 @@ import { APPROVAL_HOURS } from "@/lib/constants";
 import { addMinutesToTime, expireStaleHolds, toDateOnly } from "@/lib/availability";
 import { isPastSlot } from "@/lib/time";
 import { notifyOwnerOfNewBooking } from "@/lib/telegram";
+import { broadcastNewBooking } from "@/lib/realtime";
 
 export interface CreateBookingInput {
   pitchId: string;
@@ -76,6 +77,11 @@ export async function createBookingWithHold(input: CreateBookingInput): Promise<
           expiresAt: new Date(Date.now() + APPROVAL_HOURS * 60 * 60_000),
         },
       });
+      // Fire-and-forget from the caller's perspective in spirit, but awaited
+      // for the same serverless-lifetime reason as the Telegram send below —
+      // lets an already-open dashboard tab update without a manual reload.
+      await broadcastNewBooking(pitch.ownerId);
+
       if (pitch.owner.telegramChatId) {
         // Awaited (not fire-and-forget): in a serverless runtime, work left
         // running after the response is sent isn't guaranteed to finish.

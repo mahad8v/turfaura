@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { RealtimeBookingListener } from '@/components/owner/RealtimeBookingListener';
 import {
   Goal,
   LogOut,
@@ -72,6 +73,8 @@ interface DashboardShellProps {
   userMeta?: string;
   headerExtra?: React.ReactNode;
   logoutAction: () => Promise<void>;
+  /** Owner id to live-update this dashboard for — omit on shells that shouldn't get realtime booking pushes (e.g. admin). */
+  realtimeOwnerId?: string;
 }
 
 export function DashboardShell({
@@ -83,6 +86,7 @@ export function DashboardShell({
   userMeta,
   headerExtra,
   logoutAction,
+  realtimeOwnerId,
 }: DashboardShellProps) {
   const pathname = usePathname();
   const t = THEME[theme];
@@ -109,6 +113,8 @@ export function DashboardShell({
 
   return (
     <div className="min-h-screen bg-zinc-50 lg:flex">
+      {realtimeOwnerId && <RealtimeBookingListener ownerId={realtimeOwnerId} />}
+
       {/* Desktop sidebar */}
       <aside className="hidden lg:block lg:w-64 lg:shrink-0 lg:border-r lg:border-zinc-200 lg:bg-white">
         <div className="sticky top-0 flex h-screen flex-col">

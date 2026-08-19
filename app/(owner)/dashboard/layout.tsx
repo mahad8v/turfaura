@@ -45,6 +45,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       userName={owner.name}
       userMeta={owner.email}
       logoutAction={logout}
+      realtimeOwnerId={owner.id}
       headerExtra={
         owner.role === "ADMIN" ? (
           <Link
