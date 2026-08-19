@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { useRouter } from 'next/navigation';
+import { Search } from 'lucide-react';
 
 export function SearchBar({
   query,
@@ -27,9 +27,9 @@ export function SearchBar({
     const formData = new FormData(e.currentTarget);
     const params = new URLSearchParams();
     for (const [key, value] of formData.entries()) {
-      if (typeof value === "string" && value) params.set(key, value);
+      if (typeof value === 'string' && value) params.set(key, value);
     }
-    router.push(params.size > 0 ? `/?${params.toString()}` : "/");
+    router.push(params.size > 0 ? `/?${params.toString()}` : '/');
   }
 
   return (
@@ -43,7 +43,7 @@ export function SearchBar({
         name="q"
         defaultValue={query}
         placeholder="Pitch name or neighbourhood…"
-        className="min-w-0 flex-1 bg-transparent px-1 py-2.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
+        className="min-w-0 flex-1 bg-transparent px-1 py-.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400"
       />
       {area && <input type="hidden" name="area" value={area} />}
       {type && <input type="hidden" name="type" value={type} />}
@@ -54,7 +54,7 @@ export function SearchBar({
       <button
         type="submit"
         aria-label="Search"
-        className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white transition-all hover:bg-emerald-400 active:scale-95"
+        className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white transition-all hover:bg-emerald-400 active:scale-95"
       >
         <Search className="size-4" />
       </button>
