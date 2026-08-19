@@ -72,17 +72,31 @@ export function TelegramConnect({
         size="sm"
         icon={<Send className="size-3.5" />}
         pending={isPending}
-        onClick={() =>
+        onClick={() => {
+          // Open the tab synchronously, inside the click itself — a browser
+          // only trusts window.open as "not a popup" when it happens in the
+          // same tick as the user gesture. Opening it AFTER awaiting the
+          // server action (getConnectUrl) loses that trust and gets silently
+          // blocked, which is why nothing used to happen on click. Point
+          // this blank tab at the real URL once it's fetched instead.
+          const popup = window.open("", "_blank");
+          setError(null);
           startTransition(async () => {
-            setError(null);
             try {
               const url = await getConnectUrl();
-              window.open(url, "_blank", "noopener,noreferrer");
+              if (popup) {
+                popup.location.href = url;
+              } else {
+                // Even the synchronous open was blocked (strict popup
+                // settings) — fall back to navigating the current tab.
+                window.location.href = url;
+              }
             } catch (err) {
+              popup?.close();
               setError(err instanceof Error ? err.message : "Could not start Telegram linking.");
             }
-          })
-        }
+          });
+        }}
       >
         Connect Telegram
       </Button>
