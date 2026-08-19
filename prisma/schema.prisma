@@ -78,8 +78,8 @@ model Pitch {
   currency         String  @default("GMD")
 
   slotDurationMinutes Int    @default(60)
-  openTime            String @default("06:00") // "HH:mm", pitch's local wall-clock time
-  closeTime           String @default("22:00")
+  openTime            String @default("10:00") // "HH:mm", pitch's local wall-clock time
+  closeTime           String @default("28:00") // may exceed 24:00 for a pitch that closes after midnight — see lib/time.ts
 
   isActive Boolean @default(true)
 

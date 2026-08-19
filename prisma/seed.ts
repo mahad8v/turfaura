@@ -282,6 +282,10 @@ async function main() {
         lat: def.lat,
         lng: def.lng,
         basePricePerHour: def.basePricePerHour,
+        // 10am-4am (the next morning) — how these turfs actually run.
+        // "28:00" is 04:00 in the extended, past-midnight notation lib/time.ts uses.
+        openTime: "10:00",
+        closeTime: "28:00",
       },
       create: {
         ownerId: def.ownerId,
@@ -294,6 +298,8 @@ async function main() {
         lat: def.lat,
         lng: def.lng,
         basePricePerHour: def.basePricePerHour,
+        openTime: "10:00",
+        closeTime: "28:00",
       },
     });
     pitches.push(pitch);

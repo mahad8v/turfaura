@@ -104,9 +104,18 @@ export default async function AdminOverviewPage() {
         </div>
 
         <div className="rounded-2xl border border-zinc-200 bg-linear-to-br from-emerald-50/70 to-white p-5 lg:col-span-2">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm shadow-emerald-600/30">
-            <HandCoins className="size-4.5" strokeWidth={2.25} />
-          </span>
+          <div className="flex items-start justify-between gap-2">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm shadow-emerald-600/30">
+              <HandCoins className="size-4.5" strokeWidth={2.25} />
+            </span>
+            <Link
+              href="/admin/earnings"
+              className="group flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+            >
+              Full report
+              <ArrowRight className="size-3 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </div>
           <p className="mt-3.5 text-sm text-zinc-500">Confirmed cash value</p>
           {confirmedValue.length > 0 ? (
             <div className="mt-1 flex flex-col gap-2">

@@ -63,6 +63,12 @@ describe("formatTime12h", () => {
     expect(formatTime12h("09:05")).toBe("9:05 AM");
     expect(formatTime12h("21:30")).toBe("9:30 PM");
   });
+
+  it("normalizes an overnight pitch's extended (>24:00) time", () => {
+    // 28:00 is an overnight pitch's 4am-the-next-morning close time.
+    expect(formatTime12h("28:00")).toBe("4:00 AM");
+    expect(formatTime12h("24:00")).toBe("12:00 AM");
+  });
 });
 
 describe("formatTimeRange / formatTimeRangeShort", () => {

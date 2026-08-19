@@ -7,6 +7,7 @@ import { AvailabilityPicker } from "@/components/booking/AvailabilityPicker";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { Money } from "@/components/shared/Money";
 import { getPitchPhotoUrl } from "@/lib/storage";
+import { formatTime12h } from "@/lib/format";
 
 export default async function PitchDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -58,7 +59,8 @@ export default async function PitchDetailPage({ params }: { params: Promise<{ sl
 
           <p className="mt-4 flex items-center gap-1.5 text-sm text-zinc-500">
             <Clock className="size-4 text-zinc-400" />
-            Open {pitch.openTime}–{pitch.closeTime} · {pitch.slotDurationMinutes}-minute slots
+            Open {formatTime12h(pitch.openTime)}–{formatTime12h(pitch.closeTime)} · {pitch.slotDurationMinutes}-minute
+            slots
           </p>
 
           <div className="mt-6">

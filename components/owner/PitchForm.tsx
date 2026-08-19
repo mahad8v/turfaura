@@ -134,7 +134,13 @@ export function PitchForm({ action, defaults = {}, submitLabel }: PitchFormProps
         </SelectField>
         <div className="hidden sm:block" />
         <TextField label="Opens at" name="openTime" type="time" defaultValue={defaults.openTime ?? "06:00"} />
-        <TextField label="Closes at" name="closeTime" type="time" defaultValue={defaults.closeTime ?? "22:00"} />
+        <TextField
+          label="Closes at"
+          name="closeTime"
+          type="time"
+          defaultValue={defaults.closeTime ?? "22:00"}
+          hint="A close time before opening time means the pitch closes after midnight, e.g. opens 10:00, closes 04:00."
+        />
       </section>
 
       {state?.error && (

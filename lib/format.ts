@@ -39,10 +39,13 @@ export function formatDateShort(dateStr: string): string {
   });
 }
 
+// Normalizes an overnight pitch's extended (>24:00) close/booking times back
+// to a real 0-23 wall-clock hour before formatting — see lib/time.ts.
 export function formatTime12h(time: string): string {
   const [h, m] = time.split(":").map(Number);
-  const period = h >= 12 ? "PM" : "AM";
-  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  const hour = h % 24;
+  const period = hour >= 12 ? "PM" : "AM";
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
   return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
 }
 

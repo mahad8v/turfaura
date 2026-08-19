@@ -13,6 +13,7 @@ import { PitchForm } from '@/components/owner/PitchForm';
 import { PhotoManager } from '@/components/owner/PhotoManager';
 import { BlockedSlotManager } from '@/components/owner/BlockedSlotManager';
 import { ToggleButton } from '@/components/shared/ToggleButton';
+import { toWallClock } from '@/lib/time';
 import {
   updatePitch,
   toggleActive,
@@ -108,7 +109,11 @@ export default async function EditPitchPage({
             currency: pitch.currency,
             slotDurationMinutes: pitch.slotDurationMinutes,
             openTime: pitch.openTime,
-            closeTime: pitch.closeTime,
+            // The stored value may be in extended (>24:00) notation for an
+            // overnight pitch (see lib/time.ts) — a native <input
+            // type="time"> only accepts 00:00-23:59, so normalize it back
+            // for the form; parsePitchForm re-extends it on save if needed.
+            closeTime: toWallClock(pitch.closeTime),
           }}
         />
       </div>

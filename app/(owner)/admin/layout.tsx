@@ -12,6 +12,7 @@ const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/admin/pitches", label: "Pitches", icon: "MapPinned" },
   { href: "/admin/bookings", label: "Bookings", icon: "CalendarCheck" },
   { href: "/admin/calendar", label: "Calendar", icon: "CalendarDays" },
+  { href: "/admin/earnings", label: "Earnings", icon: "Wallet" },
   { href: "/dashboard/settings", label: "Account", icon: "User" },
 ];
 

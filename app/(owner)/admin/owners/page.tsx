@@ -1,4 +1,5 @@
-import { Users, Mail, Phone, ShieldUser, ShieldOff } from "lucide-react";
+import Link from "next/link";
+import { Users, Mail, Phone, ShieldUser, ShieldOff, ChevronRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { ToggleButton } from "@/components/shared/ToggleButton";
@@ -43,7 +44,7 @@ export default async function AdminOwnersPage() {
             className="rounded-2xl border border-zinc-200 bg-white p-4 transition-colors duration-200 hover:border-zinc-300"
           >
             <div className="flex items-start justify-between gap-2">
-              <div className="flex min-w-0 items-start gap-3">
+              <Link href={`/admin/owners/${owner.id}`} className="group flex min-w-0 items-start gap-3">
                 <span
                   className={`flex size-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br text-sm font-semibold text-white shadow-sm ${
                     owner.role === "ADMIN" ? "from-indigo-500 to-indigo-700" : "from-zinc-400 to-zinc-600"
@@ -52,7 +53,7 @@ export default async function AdminOwnersPage() {
                   {owner.name.charAt(0).toUpperCase()}
                 </span>
                 <div className="min-w-0">
-                  <p className="font-medium text-zinc-900">
+                  <p className="font-medium text-zinc-900 group-hover:text-indigo-700">
                     {owner.name}
                     {owner.id === currentAdmin.id && <span className="ml-1.5 text-xs text-zinc-400">(you)</span>}
                   </p>
@@ -67,7 +68,7 @@ export default async function AdminOwnersPage() {
                     </p>
                   )}
                 </div>
-              </div>
+              </Link>
               <span
                 className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${
                   owner.role === "ADMIN"
@@ -85,8 +86,8 @@ export default async function AdminOwnersPage() {
               </span>
               <span>Joined {owner.createdAt.toLocaleDateString()}</span>
             </div>
-            {owner.id !== currentAdmin.id && (
-              <div className="mt-3">
+            <div className="mt-3 flex items-center gap-2">
+              {owner.id !== currentAdmin.id && (
                 <ToggleButton
                   id={owner.id}
                   active={owner.role === "ADMIN"}
@@ -96,8 +97,15 @@ export default async function AdminOwnersPage() {
                   offIcon={<ShieldOff className="size-3.5" />}
                   action={toggleAdminRole}
                 />
-              </div>
-            )}
+              )}
+              <Link
+                href={`/admin/owners/${owner.id}`}
+                className="flex flex-1 items-center justify-center gap-1 rounded-full border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-50"
+              >
+                View details
+                <ChevronRight className="size-3.5" />
+              </Link>
+            </div>
           </div>
         ))}
         {owners.length === 0 && (
@@ -125,7 +133,7 @@ export default async function AdminOwnersPage() {
             {owners.map((owner) => (
               <tr key={owner.id} className="transition-colors hover:bg-zinc-50/60">
                 <td className="px-4 py-3.5">
-                  <div className="flex items-center gap-3">
+                  <Link href={`/admin/owners/${owner.id}`} className="group flex items-center gap-3">
                     <span
                       className={`flex size-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br text-xs font-semibold text-white shadow-sm ${
                         owner.role === "ADMIN" ? "from-indigo-500 to-indigo-700" : "from-zinc-400 to-zinc-600"
@@ -133,11 +141,11 @@ export default async function AdminOwnersPage() {
                     >
                       {owner.name.charAt(0).toUpperCase()}
                     </span>
-                    <span className="font-medium text-zinc-900">
+                    <span className="font-medium text-zinc-900 group-hover:text-indigo-700">
                       {owner.name}
                       {owner.id === currentAdmin.id && <span className="ml-1.5 text-xs text-zinc-400">(you)</span>}
                     </span>
-                  </div>
+                  </Link>
                 </td>
                 <td className="px-4 py-3.5">
                   <div className="flex items-center gap-1.5 text-zinc-600">
@@ -166,17 +174,26 @@ export default async function AdminOwnersPage() {
                 <td className="px-4 py-3.5 text-zinc-700">{bookingsByOwner.get(owner.id) ?? 0}</td>
                 <td className="px-4 py-3.5 text-zinc-500">{owner.createdAt.toLocaleDateString()}</td>
                 <td className="px-4 py-3.5">
-                  {owner.id !== currentAdmin.id && (
-                    <ToggleButton
-                      id={owner.id}
-                      active={owner.role === "ADMIN"}
-                      onLabel="Make admin"
-                      offLabel="Revoke admin"
-                      onIcon={<ShieldUser className="size-3.5" />}
-                      offIcon={<ShieldOff className="size-3.5" />}
-                      action={toggleAdminRole}
-                    />
-                  )}
+                  <div className="flex items-center justify-end gap-2">
+                    {owner.id !== currentAdmin.id && (
+                      <ToggleButton
+                        id={owner.id}
+                        active={owner.role === "ADMIN"}
+                        onLabel="Make admin"
+                        offLabel="Revoke admin"
+                        onIcon={<ShieldUser className="size-3.5" />}
+                        offIcon={<ShieldOff className="size-3.5" />}
+                        action={toggleAdminRole}
+                      />
+                    )}
+                    <Link
+                      href={`/admin/owners/${owner.id}`}
+                      className="flex items-center gap-1 rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-zinc-300 hover:bg-zinc-50"
+                    >
+                      View
+                      <ChevronRight className="size-3.5" />
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ))}

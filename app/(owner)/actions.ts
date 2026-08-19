@@ -16,10 +16,13 @@ export async function login(_prevState: AuthActionState | null, formData: FormDa
   if (!email || !password) return { error: "Email and password are required." };
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: error.message };
 
-  redirect("/dashboard");
+  // A super admin has no turf of their own — landing on the owner dashboard
+  // would just show its empty state. Send them straight to the admin section.
+  const owner = await prisma.owner.findUnique({ where: { supabaseUserId: data.user.id }, select: { role: true } });
+  redirect(owner?.role === "ADMIN" ? "/admin" : "/dashboard");
 }
 
 export async function signup(_prevState: AuthActionState | null, formData: FormData): Promise<AuthActionState> {

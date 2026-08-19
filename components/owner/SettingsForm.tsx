@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { User, MapPinned, Plus, Pencil, Wallet, Bell, LogOut, ChevronRight } from "lucide-react";
+import { User, MapPinned, Plus, Pencil, QrCode, Wallet, Bell, LogOut, ChevronRight } from "lucide-react";
 import { TelegramConnect } from "@/components/owner/TelegramConnect";
 import { TurfSwitcher, type SwitchableTurf } from "@/components/owner/TurfSwitcher";
 
@@ -84,6 +84,12 @@ export function SettingsForm({
             icon={Pencil}
             label="Edit pitch details"
             href={activeTurfId ? `/dashboard/pitches/${activeTurfId}` : "#"}
+            disabled={!activeTurfId}
+          />
+          <SettingsRow
+            icon={QrCode}
+            label="Share your turf"
+            href={activeTurfId ? "/dashboard/settings/share" : "#"}
             disabled={!activeTurfId}
           />
           <SettingsRow icon={Plus} label="Add a turf" href="/dashboard/pitches/new" />
