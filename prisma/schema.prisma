@@ -53,10 +53,40 @@ model Owner {
   // their own pitches, enforced at the application layer.
   activePitchId String?
 
-  pitches Pitch[]
+  pitches          Pitch[]
+  platformPayments PlatformPayment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// The platform's own monthly fee an owner pays TurfAura for listing their
+// turf(s) — distinct from the cash customers pay owners for bookings
+// (tracked on Booking). Tiered by how many turfs the account has at the
+// time it's marked paid (see lib/platform-fee.ts): 1 turf, 2-5 turfs, or
+// 6+ turfs each price differently, and the amount is locked in here rather
+// than recomputed later so a paid month's record never silently changes if
+// the owner adds or removes turfs afterward.
+model PlatformPayment {
+  id       String  @id @default(uuid())
+  ownerId  String
+  owner    Owner   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  year     Int
+  month    Int // 1-12
+  amount   Decimal @db.Decimal(10, 2)
+  currency String  @default("GMD")
+
+  paid     Boolean   @default(false)
+  paidAt   DateTime?
+  // Soft reference to the admin Owner.id who marked it paid — same pattern
+  // as Booking.approvedBy.
+  markedBy String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([ownerId, year, month])
+  @@index([ownerId])
 }
 
 model Pitch {
@@ -138,9 +168,9 @@ model BlockedSlot {
 // standing slot — as opposed to BlockedSlot's one-off specific date. Applied
 // on top of BlockedSlot in availability checks, matched by day of week.
 model RecurringBlockedSlot {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   pitchId   String
-  pitch     Pitch    @relation(fields: [pitchId], references: [id], onDelete: Cascade)
+  pitch     Pitch   @relation(fields: [pitchId], references: [id], onDelete: Cascade)
   dayOfWeek Int // 0 = Sunday .. 6 = Saturday, matches Date#getUTCDay()
   startTime String // "HH:mm"
   endTime   String // "HH:mm"

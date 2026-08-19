@@ -13,6 +13,8 @@ import {
   Pencil,
   Ban,
   CircleCheck,
+  Send,
+  CircleAlert,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
@@ -126,6 +128,17 @@ export default async function AdminOwnerDetailPage({ params }: { params: Promise
           <CalendarClock className="size-3.5 text-zinc-400" />
           Joined {owner.createdAt.toLocaleDateString()}
         </span>
+        {owner.telegramChatId ? (
+          <span className="flex items-center gap-1.5 text-emerald-700">
+            <Send className="size-3.5" />
+            Telegram connected — gets instant booking notifications
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5 text-zinc-400">
+            <CircleAlert className="size-3.5" />
+            Telegram not connected — no booking notifications
+          </span>
+        )}
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">

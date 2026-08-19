@@ -3,9 +3,9 @@ import { CalendarCheck, X } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { BookingsFilterModal } from "@/components/owner/BookingsFilterModal";
 import { BookingsTable } from "@/components/owner/BookingsTable";
+import { Pagination } from "@/components/shared/Pagination";
 import { formatDateLong, toDateStr } from "@/lib/format";
 import { BookingStatus } from "@/generated/prisma/client";
-import { approveBooking, ownerCancelBooking } from "../../dashboard/bookings/actions";
 
 const STATUS_OPTIONS: { value: BookingStatus; label: string }[] = [
   { value: BookingStatus.PENDING, label: "Awaiting approval" },
@@ -14,31 +14,52 @@ const STATUS_OPTIONS: { value: BookingStatus; label: string }[] = [
   { value: BookingStatus.EXPIRED, label: "Expired" },
 ];
 
+const PAGE_SIZE = 25;
+
 export default async function AdminBookingsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ownerId?: string; pitchId?: string; status?: string; date?: string }>;
+  searchParams: Promise<{ ownerId?: string; pitchId?: string; status?: string; date?: string; page?: string }>;
 }) {
-  const { ownerId, pitchId, status, date } = await searchParams;
+  const { ownerId, pitchId, status, date, page: pageParam } = await searchParams;
   const validStatus = STATUS_OPTIONS.some((o) => o.value === status) ? (status as BookingStatus) : undefined;
   const validDate = date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : undefined;
+  const page = Math.max(1, Number(pageParam) || 1);
 
   const [owners, pitches] = await Promise.all([
     prisma.owner.findMany({ where: { role: "OWNER" }, select: { id: true, name: true }, orderBy: { name: "asc" } }),
     prisma.pitch.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
   ]);
 
-  const bookings = await prisma.booking.findMany({
-    where: {
-      ...(ownerId ? { pitch: { ownerId } } : {}),
-      ...(pitchId ? { pitchId } : {}),
-      ...(validStatus ? { status: validStatus } : {}),
-      ...(validDate ? { date: new Date(`${validDate}T00:00:00.000Z`) } : {}),
-    },
-    include: { pitch: { select: { name: true, owner: { select: { name: true } } } } },
-    orderBy: [{ date: "desc" }, { startTime: "desc" }],
-    take: 200,
-  });
+  const bookingWhere = {
+    ...(ownerId ? { pitch: { ownerId } } : {}),
+    ...(pitchId ? { pitchId } : {}),
+    ...(validStatus ? { status: validStatus } : {}),
+    ...(validDate ? { date: new Date(`${validDate}T00:00:00.000Z`) } : {}),
+  };
+
+  const [totalCount, bookings] = await Promise.all([
+    prisma.booking.count({ where: bookingWhere }),
+    prisma.booking.findMany({
+      where: bookingWhere,
+      include: { pitch: { select: { name: true, owner: { select: { name: true } } } } },
+      orderBy: [{ date: "desc" }, { startTime: "desc" }],
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+  ]);
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
+
+  function buildPageHref(targetPage: number): string {
+    const params = new URLSearchParams();
+    if (ownerId) params.set("ownerId", ownerId);
+    if (pitchId) params.set("pitchId", pitchId);
+    if (validStatus) params.set("status", validStatus);
+    if (validDate) params.set("date", validDate);
+    if (targetPage > 1) params.set("page", String(targetPage));
+    const qs = params.toString();
+    return qs ? `/admin/bookings?${qs}` : "/admin/bookings";
+  }
 
   const rows = bookings.map((b) => ({
     id: b.id,
@@ -64,7 +85,7 @@ export default async function AdminBookingsPage({
         <div>
           <h1 className="font-display text-xl font-bold text-zinc-900">All bookings</h1>
           <p className="text-sm text-zinc-500">
-            Platform-wide view — approve, message, or cancel bookings for any owner.
+            Platform-wide view, read-only — owners approve and cancel their own bookings.
           </p>
         </div>
       </div>
@@ -95,8 +116,10 @@ export default async function AdminBookingsPage({
       </div>
 
       <div className="mt-6">
-        <BookingsTable bookings={rows} approveBooking={approveBooking} cancelBooking={ownerCancelBooking} />
+        <BookingsTable bookings={rows} />
       </div>
+
+      <Pagination page={page} totalPages={totalPages} totalCount={totalCount} pageSize={PAGE_SIZE} buildHref={buildPageHref} />
     </div>
   );
 }

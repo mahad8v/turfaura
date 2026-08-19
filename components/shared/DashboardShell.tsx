@@ -15,6 +15,7 @@ import {
   MapPinned,
   Settings,
   User,
+  Receipt,
 } from 'lucide-react';
 
 // Server Component layouts build the nav list, but React Server Components
@@ -32,6 +33,7 @@ const ICONS = {
   MapPinned,
   Settings,
   User,
+  Receipt,
 } as const;
 
 export interface DashboardNavItem {

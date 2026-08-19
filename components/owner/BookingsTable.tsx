@@ -30,8 +30,11 @@ interface CancelResult {
 
 interface BookingsTableProps {
   bookings: BookingRow[];
-  approveBooking: (bookingId: string) => Promise<void>;
-  cancelBooking: (bookingId: string) => Promise<CancelResult>;
+  // Omit both to render a read-only table — no WhatsApp/approve/cancel
+  // actions and no Actions column at all (used by the admin's platform-wide
+  // view, which can see every booking but shouldn't act on an owner's behalf).
+  approveBooking?: (bookingId: string) => Promise<void>;
+  cancelBooking?: (bookingId: string) => Promise<CancelResult>;
 }
 
 function whatsAppMessage(b: BookingRow): string {
@@ -72,6 +75,7 @@ export function BookingsTable({ bookings, approveBooking, cancelBooking }: Booki
   const [isPending, startTransition] = useTransition();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const readOnly = !approveBooking && !cancelBooking;
 
   function run(bookingId: string, fn: () => Promise<void | CancelResult>) {
     setError(null);
@@ -134,14 +138,16 @@ export function BookingsTable({ bookings, approveBooking, cancelBooking }: Booki
                   <Money amount={b.totalPrice} currency={b.currency} />
                 </p>
               </div>
-              <div className="mt-3">
-                <BookingActions
-                  booking={b}
-                  pending={rowPending}
-                  onApprove={() => run(b.id, () => approveBooking(b.id))}
-                  onCancel={() => run(b.id, () => cancelBooking(b.id))}
-                />
-              </div>
+              {!readOnly && (
+                <div className="mt-3">
+                  <BookingActions
+                    booking={b}
+                    pending={rowPending}
+                    onApprove={() => run(b.id, () => approveBooking!(b.id))}
+                    onCancel={() => run(b.id, () => cancelBooking!(b.id))}
+                  />
+                </div>
+              )}
             </div>
           );
         })}
@@ -157,7 +163,7 @@ export function BookingsTable({ bookings, approveBooking, cancelBooking }: Booki
               <th className="px-4 py-3">Customer</th>
               <th className="px-4 py-3">Price</th>
               <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Actions</th>
+              {!readOnly && <th className="px-4 py-3">Actions</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
@@ -185,14 +191,16 @@ export function BookingsTable({ bookings, approveBooking, cancelBooking }: Booki
                   <td className="px-4 py-3.5">
                     <BookingStatusBadge status={b.status} />
                   </td>
-                  <td className="px-4 py-3.5">
-                    <BookingActions
-                      booking={b}
-                      pending={rowPending}
-                      onApprove={() => run(b.id, () => approveBooking(b.id))}
-                      onCancel={() => run(b.id, () => cancelBooking(b.id))}
-                    />
-                  </td>
+                  {!readOnly && (
+                    <td className="px-4 py-3.5">
+                      <BookingActions
+                        booking={b}
+                        pending={rowPending}
+                        onApprove={() => run(b.id, () => approveBooking!(b.id))}
+                        onCancel={() => run(b.id, () => cancelBooking!(b.id))}
+                      />
+                    </td>
+                  )}
                 </tr>
               );
             })}
