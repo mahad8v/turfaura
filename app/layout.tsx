@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Manrope } from "next/font/google";
 import { Providers } from "@/components/Providers";
+import { NetworkStatus } from "@/components/shared/NetworkStatus";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${manrope.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <NetworkStatus />
         <Providers>{children}</Providers>
       </body>
     </html>

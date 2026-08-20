@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { MapPin, CircleDollarSign, Clock, CircleAlert } from "lucide-react";
 import { TextField, TextAreaField, SelectField } from "@/components/shared/fields";
 import { Button } from "@/components/shared/Button";
+import { LocationPicker } from "@/components/owner/LocationPicker";
 import { PITCH_TYPE_LABELS, PITCH_TYPE_OPTIONS } from "@/lib/pitch-type";
 import type { PitchType } from "@/generated/prisma/client";
 
@@ -98,15 +99,7 @@ export function PitchForm({ action, defaults = {}, submitLabel }: PitchFormProps
           rows={3}
           className="sm:col-span-2"
         />
-        <TextField
-          label="Latitude"
-          name="lat"
-          type="number"
-          step="any"
-          defaultValue={defaults.lat}
-          hint="Right-click the spot on Google Maps and copy the coordinates."
-        />
-        <TextField label="Longitude" name="lng" type="number" step="any" defaultValue={defaults.lng} />
+        <LocationPicker lat={defaults.lat} lng={defaults.lng} />
       </section>
 
       <section className={`grid gap-4 rounded-2xl border border-zinc-200 bg-white p-5 sm:grid-cols-2 ${tab === "pricing" ? "" : "hidden"}`}>
