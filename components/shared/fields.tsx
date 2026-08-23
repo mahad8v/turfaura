@@ -73,6 +73,11 @@ export function TextField({
           }}
           className={`peer ${inputBaseClass} ${inputSizeClass[inputSize]} ${icon ? "pl-11" : ""} ${
             isDateTimeType && isEmpty ? "text-transparent focus:text-zinc-900" : "text-zinc-900"
+          } ${
+            // iOS Safari otherwise partly ignores this input's padding/height
+            // and sizes it off its own native chrome instead — shorter and
+            // wider than every sibling field, even with identical classes.
+            isDateTimeType ? "appearance-none" : ""
           } ${className ?? ""}`}
           {...props}
         />
