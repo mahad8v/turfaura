@@ -229,7 +229,7 @@ export function BlockedSlotManager({
         )}
 
         <form action={handleAdd} className="mt-4 flex flex-col gap-3 border-t border-zinc-100 pt-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <TextField label="Date" name="date" type="date" required />
             <TextField label="From" name="startTime" type="time" defaultValue="00:00" />
             <TextField label="To (optional)" name="endTime" type="time" />

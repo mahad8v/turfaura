@@ -104,6 +104,14 @@ export function LocationPicker({ lat, lng }: { lat?: number; lng?: number }) {
       setError("Your browser doesn't support location lookup.");
       return;
     }
+    // The permission prompt itself only appears over a secure context
+    // (https, or localhost) — over plain http on a LAN/IP address (e.g.
+    // testing on a phone against your computer's network address) the
+    // browser silently refuses without ever asking.
+    if (!window.isSecureContext) {
+      setError("Location access needs a secure (https) connection — tap the map to set the pin instead.");
+      return;
+    }
     setError(null);
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
@@ -119,9 +127,13 @@ export function LocationPicker({ lat, lng }: { lat?: number; lng?: number }) {
           instance.map.setView(next, 16);
         }
       },
-      () => {
+      (err) => {
         setLocating(false);
-        setError("Couldn't get your location — make sure location access is allowed, or tap the map instead.");
+        setError(
+          err.code === err.PERMISSION_DENIED
+            ? "Location access is blocked for this site — check your browser's site settings, or tap the map instead."
+            : "Couldn't get your location — make sure location access is allowed, or tap the map instead.",
+        );
       },
     );
   }

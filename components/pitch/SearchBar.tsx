@@ -54,7 +54,7 @@ export function SearchBar({
       <button
         type="submit"
         aria-label="Search"
-        className="flex size-4 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white transition-all hover:bg-emerald-400 active:scale-95"
+        className="flex size-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white transition-all hover:bg-emerald-400 active:scale-95"
       >
         <Search className="size-4" />
       </button>
