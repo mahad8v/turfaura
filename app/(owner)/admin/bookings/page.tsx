@@ -43,7 +43,7 @@ export default async function AdminBookingsPage({
     prisma.booking.findMany({
       where: bookingWhere,
       include: { pitch: { select: { name: true, owner: { select: { name: true } } } } },
-      orderBy: [{ date: "desc" }, { startTime: "desc" }],
+      orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),

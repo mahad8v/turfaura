@@ -57,7 +57,7 @@ export default async function AdminPaymentsPage({
     prisma.owner.findMany({
       where: { role: "OWNER", pitches: { some: {} } },
       select: { id: true, name: true, email: true, _count: { select: { pitches: true } } },
-      orderBy: { name: "asc" },
+      orderBy: { createdAt: "desc" },
     }),
     prisma.platformPayment.findMany({ where: { year, month } }),
   ]);

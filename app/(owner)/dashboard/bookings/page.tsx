@@ -46,7 +46,7 @@ export default async function BookingsPage({
       ...(validStatus ? { status: validStatus } : {}),
       ...(validDate ? { date: new Date(`${validDate}T00:00:00.000Z`) } : {}),
     },
-    orderBy: [{ date: "desc" }, { startTime: "desc" }],
+    orderBy: { createdAt: "desc" },
     take: 200,
   });
 
