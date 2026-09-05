@@ -29,10 +29,10 @@ export default async function PublicLayout({
           <div className="flex shrink-0 items-center gap-2">
             <Link
               href="/my-bookings"
-              aria-label="My bookings"
-              className="flex size-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 transition-colors hover:bg-zinc-200"
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-2.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-200 sm:px-3.5 sm:text-sm"
             >
-              <Ticket className="size-4" strokeWidth={2.25} />
+              <Ticket className="size-4 shrink-0" strokeWidth={2.25} />
+              <span>My bookings</span>
             </Link>
             <UserMenu loggedIn={Boolean(user)} logoutAction={logout} />
           </div>
