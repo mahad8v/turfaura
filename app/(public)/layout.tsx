@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Goal } from 'lucide-react';
+import { Goal, Ticket } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { UserMenu } from '@/components/shared/UserMenu';
 import { logout } from '../(owner)/actions';
@@ -26,7 +26,16 @@ export default async function PublicLayout({
               TurfAura
             </span>
           </Link>
-          <UserMenu loggedIn={Boolean(user)} logoutAction={logout} />
+          <div className="flex shrink-0 items-center gap-2">
+            <Link
+              href="/my-bookings"
+              aria-label="My bookings"
+              className="flex size-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-600 transition-colors hover:bg-zinc-200"
+            >
+              <Ticket className="size-4" strokeWidth={2.25} />
+            </Link>
+            <UserMenu loggedIn={Boolean(user)} logoutAction={logout} />
+          </div>
         </div>
       </header>
       <main className="flex-1">{children}</main>

@@ -6,6 +6,7 @@ import { Money } from "@/components/shared/Money";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { CancelBookingButton } from "@/components/booking/CancelBookingButton";
 import { PitchMap } from "@/components/pitch/PitchMap";
+import { SaveBookingToLocal } from "@/components/booking/SaveBookingToLocal";
 import { formatDateLong, formatTimeRange, toDateStr } from "@/lib/format";
 import { BookingStatus } from "@/generated/prisma/client";
 import { cancelBooking } from "./actions";
@@ -15,7 +16,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ refere
 
   const booking = await prisma.booking.findUnique({
     where: { reference },
-    include: { pitch: { include: { owner: true } } },
+    include: { pitch: { include: { owner: true, photos: { take: 1, select: { storagePath: true } } } } },
   });
 
   if (!booking) notFound();
@@ -104,6 +105,25 @@ export default async function ReceiptPage({ params }: { params: Promise<{ refere
           </div>
         )}
       </div>
+
+      <SaveBookingToLocal
+        booking={{
+          reference: booking.reference,
+          status: booking.status,
+          date: dateStr,
+          startTime: booking.startTime,
+          endTime: booking.endTime,
+          totalPrice: booking.totalPrice.toString(),
+          currency: booking.currency,
+          customerPhone: booking.customerPhone,
+          pitchSlug: booking.pitch.slug,
+          pitchName: booking.pitch.name,
+          pitchAddress: booking.pitch.address,
+          lat: booking.pitch.lat,
+          lng: booking.pitch.lng,
+          photoPath: booking.pitch.photos[0]?.storagePath ?? null,
+        }}
+      />
     </div>
   );
 }
