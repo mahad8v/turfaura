@@ -24,7 +24,7 @@ const bookingIcons: Record<BookingStatus, typeof Clock> = {
 
 function Badge({ className, icon: Icon, children }: { className: string; icon: typeof Clock; children: React.ReactNode }) {
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${className}`}>
+    <span className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${className}`}>
       <Icon className="size-3.5" strokeWidth={2.25} />
       {children}
     </span>

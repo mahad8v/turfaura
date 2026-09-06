@@ -39,6 +39,7 @@ export function TextField({
   className,
   type,
   defaultValue,
+  value,
   placeholder,
   onChange,
   ...props
@@ -50,7 +51,9 @@ export function TextField({
   // while empty and unfocused so the two don't double up, and restored
   // (via :focus, pure CSS — no extra state needed) once the picker is open.
   const isDateTimeType = type === "date" || type === "time";
-  const [isEmpty, setIsEmpty] = useState(() => isDateTimeType && !defaultValue);
+  // A controlled field passes `value`, an uncontrolled one `defaultValue` —
+  // either can say whether it starts out empty.
+  const [isEmpty, setIsEmpty] = useState(() => isDateTimeType && !(value ?? defaultValue));
 
   return (
     <label className="flex flex-col gap-1.5" htmlFor={name}>
@@ -66,6 +69,7 @@ export function TextField({
           type={type}
           required={required}
           defaultValue={defaultValue}
+          value={value}
           placeholder={placeholder}
           onChange={(e) => {
             if (isDateTimeType) setIsEmpty(!e.target.value);

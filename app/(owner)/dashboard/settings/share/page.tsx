@@ -3,6 +3,7 @@ import Image from "next/image";
 import QRCode from "qrcode";
 import { ChevronLeft, MapPinned, LinkIcon } from "lucide-react";
 import { getOwnerWithActivePitch } from "@/lib/active-pitch";
+import { getSiteUrl } from "@/lib/site-url";
 import { ShareActions } from "@/components/owner/ShareActions";
 
 export default async function ShareTurfPage() {
@@ -29,8 +30,7 @@ export default async function ShareTurfPage() {
     );
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const shareUrl = `${baseUrl}/pitches/${activePitch.slug}`;
+  const shareUrl = `${getSiteUrl()}/pitches/${activePitch.slug}`;
   const qrDataUrl = await QRCode.toDataURL(shareUrl, {
     width: 480,
     margin: 1,

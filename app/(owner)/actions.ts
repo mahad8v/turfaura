@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
+import { getSiteUrl } from "@/lib/site-url";
 
 export interface AuthActionState {
   error?: string;
@@ -36,7 +37,11 @@ export async function signup(_prevState: AuthActionState | null, formData: FormD
   if (password.length < 8) return { error: "Password must be at least 8 characters." };
 
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: `${getSiteUrl()}/login` },
+  });
   if (error) return { error: error.message };
   if (!data.user) return { error: "Could not create your account. Please try again." };
 

@@ -160,8 +160,12 @@ export function LocationPicker({ lat, lng }: { lat?: number; lng?: number }) {
         </button>
       </div>
       {error && <p className="text-xs text-red-600">{error}</p>}
-      <input ref={latInputRef} type="hidden" name="lat" defaultValue={position.lat} />
-      <input ref={lngInputRef} type="hidden" name="lng" defaultValue={position.lng} />
+      {/* Controlled (not defaultValue): the outer PitchForm's <form action>
+          gets reset by React after every submit, including a failed one —
+          value={} re-asserts these from position, which that reset can't
+          touch, so a moved pin survives a validation error elsewhere. */}
+      <input ref={latInputRef} type="hidden" name="lat" value={position.lat} readOnly />
+      <input ref={lngInputRef} type="hidden" name="lng" value={position.lng} readOnly />
     </div>
   );
 }
