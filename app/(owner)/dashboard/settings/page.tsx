@@ -1,5 +1,6 @@
 import { getOwnerWithActivePitch } from "@/lib/active-pitch";
 import { SettingsForm } from "@/components/owner/SettingsForm";
+import { BiometricSettings } from "@/components/owner/BiometricSettings";
 import { isTelegramConfigured } from "@/lib/telegram";
 import { logout } from "../../actions";
 import { getTelegramConnectUrl, disconnectTelegram, setActivePitch } from "./actions";
@@ -10,7 +11,8 @@ export default async function SettingsPage() {
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="font-display text-center text-xl font-bold text-zinc-900">Account</h1>
-      <div className="mt-6">
+      <div className="mt-6 flex flex-col gap-5">
+        <BiometricSettings email={owner.email} />
         <SettingsForm
           telegramConfigured={isTelegramConfigured()}
           telegramConnected={Boolean(owner.telegramChatId)}

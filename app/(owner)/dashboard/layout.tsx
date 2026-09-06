@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { ShieldUser } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { logout } from "../actions";
 import { DashboardShell, type DashboardNavItem } from "@/components/shared/DashboardShell";
+import { BiometricEnrollPrompt } from "@/components/owner/BiometricEnrollPrompt";
 
 const NAV_ITEMS: DashboardNavItem[] = [
   { href: "/dashboard", label: "Overview", icon: "LayoutDashboard", exact: true },
@@ -60,6 +62,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
       }
     >
       {children}
+      <Suspense fallback={null}>
+        <BiometricEnrollPrompt email={owner.email} />
+      </Suspense>
     </DashboardShell>
   );
 }
