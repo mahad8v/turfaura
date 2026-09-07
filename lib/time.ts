@@ -47,6 +47,22 @@ export function toWallClock(time: string): string {
 }
 
 /**
+ * Turns a "YYYY-MM-DD" date + possibly-extended (>24:00) "HH:mm" time into
+ * a real UTC Date — e.g. ("2026-01-01", "28:00") becomes 2026-01-02T04:00Z.
+ * Dates/times are treated as plain UTC wall-clock throughout this app (see
+ * toDateOnly in availability.ts), so no timezone conversion happens here.
+ */
+export function slotToDate(dateStr: string, time: string): Date {
+  const minutes = timeToMinutes(time);
+  const daysToAdd = Math.floor(minutes / DAY_MINUTES);
+  const wallClockMinutes = ((minutes % DAY_MINUTES) + DAY_MINUTES) % DAY_MINUTES;
+  const date = new Date(`${dateStr}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() + daysToAdd);
+  date.setUTCHours(Math.floor(wallClockMinutes / 60), wallClockMinutes % 60, 0, 0);
+  return date;
+}
+
+/**
  * True if a "YYYY-MM-DD" date + "HH:mm" start time has already passed,
  * against the current clock — dates/times are treated as plain UTC
  * wall-clock values throughout this app (see toDateOnly in availability.ts),

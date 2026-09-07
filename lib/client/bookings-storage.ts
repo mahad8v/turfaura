@@ -1,4 +1,5 @@
 // Client-only (uses localStorage) — never import this from a Server Component.
+import { slotToDate } from "@/lib/time";
 
 export type StoredBookingStatus = "PENDING" | "CONFIRMED" | "CANCELLED" | "EXPIRED";
 
@@ -64,15 +65,13 @@ export function removeStoredBooking(reference: string): void {
 }
 
 /**
- * A booking stays visible through its own day plus one extra grace day (an
- * overnight slot's actual end time can fall after midnight the next day —
- * see lib/time.ts), then it's pruned automatically on the next visit.
+ * True once the booking's actual end time has passed — not just its date,
+ * so an overnight slot (e.g. ends "28:00", really 4am the next day) stays
+ * visible until it genuinely finishes, using the same extended-notation
+ * time math the rest of the app uses (see lib/time.ts).
  */
-export function isBookingExpired(booking: { date: string }): boolean {
-  const today = new Date().toISOString().slice(0, 10);
-  const cutoff = new Date(`${today}T00:00:00.000Z`);
-  cutoff.setUTCDate(cutoff.getUTCDate() - 1);
-  return Date.parse(`${booking.date}T00:00:00.000Z`) < cutoff.getTime();
+export function isBookingExpired(booking: { date: string; endTime: string }): boolean {
+  return slotToDate(booking.date, booking.endTime).getTime() < Date.now();
 }
 
 /** Drops expired bookings from storage and returns what's left. */
