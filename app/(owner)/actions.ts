@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
+import { getSiteUrl } from "@/lib/site-url";
 
 export interface AuthActionState {
   error?: string;
@@ -56,10 +57,19 @@ export async function signup(_prevState: SignupActionState | null, formData: For
   if (password.length < 8) return { error: "Password must be at least 8 characters." };
 
   const supabase = await createClient();
-  // No emailRedirectTo — the confirmation email shows a 6-digit code
-  // (Supabase's "Confirm signup" template, edited to include {{ .Token }})
-  // instead of a clickable link, so there's no redirect URL to get wrong.
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  // The confirmation email's primary path is the 6-digit code (Supabase's
+  // "Confirm signup" template, edited to include {{ .Token }}), but
+  // Supabase's default template still also shows a clickable link
+  // ({{ .ConfirmationURL }}) unless that's been removed too — some people
+  // click it out of habit instead of typing the code. emailRedirectTo
+  // makes sure that link points at this app instead of Supabase's
+  // dashboard-configured Site URL default (which is localhost unless
+  // that's been changed there too).
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { emailRedirectTo: `${getSiteUrl()}/login` },
+  });
   if (error) return { error: error.message };
   if (!data.user) return { error: "Could not create your account. Please try again." };
 

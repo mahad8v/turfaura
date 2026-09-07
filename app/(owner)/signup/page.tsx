@@ -10,7 +10,7 @@ import { Button } from "@/components/shared/Button";
 export default function SignupPage() {
   const [state, formAction, pending] = useActionState(signup, null);
   const [verifyState, verifyAction, verifyPending] = useActionState(verifySignupCode, null);
-  const [resendMessage, setResendMessage] = useState<string | null>(null);
+  const [resendMessage, setResendMessage] = useState<{ text: string; isError: boolean } | null>(null);
   const [resending, startResend] = useTransition();
 
   const awaitingCode = state?.awaitingCode || verifyState?.awaitingCode;
@@ -20,7 +20,9 @@ export default function SignupPage() {
     setResendMessage(null);
     startResend(async () => {
       const result = await resendSignupCode(email);
-      setResendMessage(result.error ?? "Code resent — check your email.");
+      setResendMessage(
+        result.error ? { text: result.error, isError: true } : { text: "Code resent — check your email.", isError: false },
+      );
     });
   }
 
@@ -76,7 +78,16 @@ export default function SignupPage() {
               <RotateCw className={`size-3.5 ${resending ? "animate-spin" : ""}`} />
               Resend code
             </button>
-            {resendMessage && <p className="mt-2 text-center text-xs text-zinc-500">{resendMessage}</p>}
+            {resendMessage && (
+              <p
+                className={`mt-2 flex items-center justify-center gap-1.5 text-center text-sm ${
+                  resendMessage.isError ? "text-red-600" : "text-emerald-700"
+                }`}
+              >
+                {resendMessage.isError && <CircleAlert className="size-4 shrink-0" />}
+                {resendMessage.text}
+              </p>
+            )}
           </div>
         ) : (
           <div className="rounded-2xl border border-zinc-200 bg-white p-7">
